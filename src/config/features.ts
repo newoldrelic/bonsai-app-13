@@ -13,7 +13,7 @@ export interface Feature {
 export const FEATURES: Feature[] = [
   {
     id: 'collection',
-    name: 'Tree Collection',
+    name: 'My Bonsai Garden',
     description: 'Manage and track your bonsai collection',
     path: '/dashboard',
     icon: TreeDeciduous,

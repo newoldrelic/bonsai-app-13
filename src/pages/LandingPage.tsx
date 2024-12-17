@@ -301,7 +301,7 @@ export function LandingPage() {
                     className="btn-primary group relative overflow-hidden px-6 py-2 rounded-full"
                   >
                     <span className="relative z-10 flex items-center justify-center space-x-2">
-                      <span>View Your Collection</span>
+                      <span>View Your Bonsai Garden</span>
                       <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />

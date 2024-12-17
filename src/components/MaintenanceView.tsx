@@ -61,7 +61,7 @@ export function MaintenanceView() {
 
         {trees.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">No trees in your collection yet</p>
+            <p className="text-gray-500">No trees in your bonsai garden yet</p>
           </div>
         )}
       </div>

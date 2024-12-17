@@ -78,7 +78,7 @@ export function HistoryView() {
         {trees.length === 0 && (
           <div className="text-center py-12">
             <TreeDeciduous className="w-16 h-16 text-bonsai-green/30 mx-auto mb-3" />
-            <p className="text-gray-500">No trees in your collection yet</p>
+            <p className="text-gray-500">No trees in your bonsai garden yet</p>
           </div>
         )}
       </div>

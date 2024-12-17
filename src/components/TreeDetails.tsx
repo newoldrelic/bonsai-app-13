@@ -25,7 +25,7 @@ export function TreeDetails() {
             onClick={() => navigate('/dashboard')}
             className="mt-4 text-bonsai-green hover:text-bonsai-moss transition-colors"
           >
-            Return to Collection
+            Return to your Bonsai Garden
           </button>
         </div>
       </div>

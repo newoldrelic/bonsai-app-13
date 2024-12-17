@@ -60,7 +60,7 @@ export function Dashboard() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">My Collection</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">My Bonsai Garden</h2>
         <div className="flex items-center space-x-4">
           {offline && (
             <div className="flex items-center text-amber-500 dark:text-amber-400">
@@ -103,7 +103,7 @@ export function Dashboard() {
         
         {trees.length === 0 && (
           <div className="col-span-full text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No trees in your collection yet.</p>
+            <p className="text-gray-500 dark:text-gray-400">No trees in your garden yet.</p>
             <button
               onClick={handleAddTreeClick}
               className="mt-4 text-bonsai-green hover:text-bonsai-moss transition-colors"
