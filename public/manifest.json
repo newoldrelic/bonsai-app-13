@@ -1,0 +1,18 @@
+{
+    "name": "Bonsai for Beginners",
+    "short_name": "Bonsai",
+    "description": "Track and manage your bonsai tree maintenance",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#16a34a",
+    "scope": "/",
+    "icons": [
+      {
+        "src": "/bonsai-icon.svg",
+        "type": "image/svg+xml",
+        "sizes": "any",
+        "purpose": "any maskable"
+      }
+    ]
+  }

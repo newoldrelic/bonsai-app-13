@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  
+  body {
+    @apply antialiased text-bonsai-stone dark:text-white bg-stone-100 dark:bg-stone-900;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+  
+  .btn-primary {
+    @apply bg-bonsai-terra text-white hover:bg-bonsai-clay shadow-md hover:shadow-lg;
+  }
+
+  .card {
+    @apply bg-white dark:bg-stone-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-200;
+  }
+
+  .form-group {
+    @apply space-y-1;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-stone-700 dark:text-stone-300;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-2.5 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-600 rounded-lg 
+    focus:ring-2 focus:ring-bonsai-green focus:border-bonsai-green
+    placeholder:text-stone-400 dark:placeholder:text-stone-500
+    hover:border-stone-400 dark:hover:border-stone-500
+    transition-colors duration-200;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+}

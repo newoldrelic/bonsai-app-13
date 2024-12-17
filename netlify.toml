@@ -1,0 +1,52 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "dist/api/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@netlify/functions"]
+  directory = "dist/api/functions"
+  included_files = ["*.js"]
+
+[[redirects]]
+  from = "/api/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
+
+[build.environment]
+  NODE_VERSION = "18"
+  NODE_ENV = "production"
+  CI = "true"
+  NPM_FLAGS = "--legacy-peer-deps --include=dev"
+
+[dev]
+  command = "npm run dev"
+  framework = "#custom"
+  targetPort = 5173
+
+[template.environment]
+  STRIPE_PUBLISHABLE_KEY = "Secret key from Stripe dashboard"
+  STRIPE_SECRET_KEY = "Secret key from Stripe dashboard"
+  STRIPE_WEBHOOK_SECRET = "Webhook signing secret from Stripe dashboard"
+  OPENAI_API_KEY = "Secret key from OpenAI dashboard"
+  FIREBASE_PRIVATE_KEY = "Firebase Admin SDK private key"
+  FIREBASE_PROJECT_ID = "Firebase project ID"
+  FIREBASE_CLIENT_EMAIL = "Firebase Admin SDK client email"
+
+[[headers]]
+  for = "/*"
+    [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/assets/*"
+    [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
