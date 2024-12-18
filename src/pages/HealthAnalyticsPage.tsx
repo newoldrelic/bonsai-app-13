@@ -7,6 +7,7 @@ import { MarkdownContent } from '../components/MarkdownContent';
 import HealthScores from '../components/HealthScores';
 import { FEATURES } from '../config/features';
 import { downloadText, formatAnalysisForDownload } from '../utils/download';
+import { AI_PROMPTS } from '../config/ai-prompts';
 
 const feature = FEATURES.find(f => f.id === 'health-analytics')!;
 
