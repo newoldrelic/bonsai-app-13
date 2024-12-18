@@ -6,8 +6,8 @@ import { HealthAnalyzer } from '../components/HealthAnalyzer';
 import { MarkdownContent } from '../components/MarkdownContent';
 import HealthScores from '../components/HealthScores';
 import { FEATURES } from '../config/features';
-import { downloadText, formatAnalysisForDownload } from '../utils/download';
 import { AI_PROMPTS } from '../config/ai-prompts';
+import { downloadText, formatAnalysisForDownload } from '../utils/download';
 
 const feature = FEATURES.find(f => f.id === 'health-analytics')!;
 
@@ -73,33 +73,57 @@ export function HealthAnalyticsPage() {
           throw new Error(data.error);
         }
 
+        // Log the response to see what we're getting
+        console.log('API Response:', data);
+
+        // Parse the response - it might be a string that needs to be parsed
+        let parsedData;
+        try {
+          // If data.analysis is a string containing JSON
+          parsedData = typeof data.analysis === 'string' 
+            ? JSON.parse(data.analysis) 
+            : data;
+        } catch (e) {
+          console.error('Failed to parse analysis:', e);
+          throw new Error('Invalid response format from analysis');
+        }
+
+        // Validate the required fields exist
+        if (!parsedData.scores || 
+            typeof parsedData.scores.leafCondition === 'undefined' ||
+            typeof parsedData.scores.diseaseAndPests === 'undefined' ||
+            typeof parsedData.scores.overallVigor === 'undefined') {
+          throw new Error('Incomplete analysis data received');
+        }
+
         // Create the scores array for the HealthScores component
         const healthScores = [
           {
             category: 'Leaf Condition',
-            score: data.scores.leafCondition,
+            score: parsedData.scores.leafCondition,
             icon: <Leaf className="w-6 h-6" />,
             description: 'Overall health and appearance of leaves'
           },
           {
             category: 'Disease & Pests',
-            score: data.scores.diseaseAndPests,
+            score: parsedData.scores.diseaseAndPests,
             icon: <Bug className="w-6 h-6" />,
             description: 'Presence of diseases or pest infestations'
           },
           {
             category: 'Overall Vigor',
-            score: data.scores.overallVigor,
+            score: parsedData.scores.overallVigor,
             icon: <TreeDeciduous className="w-6 h-6" />,
             description: 'General health and growth potential'
           }
         ];
 
         setAnalysis({
-          text: data.analysis,
+          text: parsedData.analysis,
           scores: healthScores
         });
       } catch (err: any) {
+        console.error('Analysis error:', err);
         setError(err.message || 'Failed to analyze image');
       } finally {
         setLoading(false);
