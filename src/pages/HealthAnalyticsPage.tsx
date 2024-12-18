@@ -70,26 +70,28 @@ export function HealthAnalyticsPage() {
 
         const data = await response.json();
         console.log('Raw API Response:', data);
-        console.log('Response type:', typeof data);
-        console.log('Response analysis type:', typeof data.analysis);
-        if (typeof data.analysis === 'string') {
-          console.log('Analysis content:', data.analysis.substring(0, 100) + '...');
-        }
 
         if (data.error) {
           throw new Error(data.error);
         }
 
+        // Clean up the JSON string by removing markdown code blocks
+        const cleanJsonString = data.analysis
+          .replace(/```json\n?/g, '')  // Remove ```json
+          .replace(/```\n?/g, '')      // Remove closing ```
+          .trim();                     // Remove any extra whitespace
+
+        console.log('Cleaned JSON string:', cleanJsonString);
+
         let parsedData;
         try {
-          // If data.analysis is a string containing JSON
-          parsedData = typeof data.analysis === 'string' 
-            ? JSON.parse(data.analysis) 
-            : data;
+          parsedData = JSON.parse(cleanJsonString);
         } catch (e) {
           console.error('Failed to parse analysis:', e);
           throw new Error('Invalid response format from analysis');
         }
+
+        console.log('Parsed data:', parsedData);
 
         // Validate the required fields exist
         if (!parsedData.scores || 
