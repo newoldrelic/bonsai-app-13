@@ -13,16 +13,9 @@ interface HealthAnalyzerProps {
 export function HealthAnalyzer({ onAnalyze, loading, error, currentStep, steps }: HealthAnalyzerProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  const handleImageCapture = async (file: File) => {
-    try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } catch (err: any) {
-      console.error('Error reading file:', err);
-    }
+  const handleImageCapture = async (dataUrl: string) => {
+    // Simply store the dataUrl directly - no need for FileReader
+    setPreviewImage(dataUrl);
   };
 
   const handleAnalyze = () => {
@@ -34,7 +27,10 @@ export function HealthAnalyzer({ onAnalyze, loading, error, currentStep, steps }
   return (
     <div className="space-y-4">
       {!previewImage ? (
-        <ImageUpload onImageCapture={handleImageCapture} />
+        <ImageUpload 
+          onImageCapture={handleImageCapture}
+          onError={(error) => console.error('Upload error:', error)} 
+        />
       ) : (
         <div className="space-y-4">
           <div className="relative">
