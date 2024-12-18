@@ -29,8 +29,7 @@ export const AI_PROMPTS = {
     }`,
     model: "gpt-4o",
     maxTokens: 500
-  }
-},
+  },
   expertCoaching: {
     prompt: `You are Ken Nakamura (AI), a renowned bonsai master with over 30 years of experience. You are helping a beginner learn about bonsai care and cultivation.
 
