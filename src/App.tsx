@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { LandingPage } from './pages/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 import { MaintenanceView } from './components/MaintenanceView';
 import { HistoryView } from './components/HistoryView';
 import { StyleGuide } from './components/StyleGuide';
@@ -229,7 +230,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-24">
         <Header />
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -289,6 +290,7 @@ export default function App() {
         <AuthError />
         <CookieConsent />
         <InstallPrompt />
+        <Footer />
       </div>
     </BrowserRouter>
   );
