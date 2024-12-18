@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Leaf, TreeDeciduous, Crown, ArrowRight, Info } from 'lucide-react';
+import { Leaf, TreeDeciduous, Crown, ArrowRight, Info, Bug } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import { HealthAnalyzer } from '../components/HealthAnalyzer';
 import { MarkdownContent } from '../components/MarkdownContent';
+import HealthScores from '../components/HealthScores';
 import { FEATURES } from '../config/features';
 import { downloadText, formatAnalysisForDownload } from '../utils/download';
 
@@ -17,12 +18,24 @@ const ANALYSIS_STEPS = [
   'Generating recommendations...'
 ];
 
+interface HealthScore {
+  category: string;
+  score: number;
+  icon: React.ReactNode;
+  description: string;
+}
+
+interface AnalysisResult {
+  text: string;
+  scores: HealthScore[];
+}
+
 export function HealthAnalyticsPage() {
   const navigate = useNavigate();
   const { getCurrentPlan } = useSubscriptionStore();
   const currentPlan = getCurrentPlan();
-  const isSubscribed = currentPlan !== 'hobby';
-  const [analysis, setAnalysis] = useState<string | null>(null);
+  const isSubscribed = currentPlan.id !== 'hobby';
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -45,7 +58,8 @@ export function HealthAnalyticsPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            image: imageData
+            image: imageData,
+            prompt: AI_PROMPTS.healthAnalysis.prompt,
           }),
         });
 
@@ -58,7 +72,32 @@ export function HealthAnalyticsPage() {
           throw new Error(data.error);
         }
 
-        setAnalysis(data.analysis);
+        // Create the scores array for the HealthScores component
+        const healthScores = [
+          {
+            category: 'Leaf Condition',
+            score: data.scores.leafCondition,
+            icon: <Leaf className="w-6 h-6" />,
+            description: 'Overall health and appearance of leaves'
+          },
+          {
+            category: 'Disease & Pests',
+            score: data.scores.diseaseAndPests,
+            icon: <Bug className="w-6 h-6" />,
+            description: 'Presence of diseases or pest infestations'
+          },
+          {
+            category: 'Overall Vigor',
+            score: data.scores.overallVigor,
+            icon: <TreeDeciduous className="w-6 h-6" />,
+            description: 'General health and growth potential'
+          }
+        ];
+
+        setAnalysis({
+          text: data.analysis,
+          scores: healthScores
+        });
       } catch (err: any) {
         setError(err.message || 'Failed to analyze image');
       } finally {
@@ -81,7 +120,7 @@ export function HealthAnalyticsPage() {
 
   const handleDownload = () => {
     if (analysis) {
-      const formattedContent = formatAnalysisForDownload(analysis, 'health');
+      const formattedContent = formatAnalysisForDownload(analysis.text, 'health');
       downloadText(formattedContent, `bonsai-health-analysis-${Date.now()}.txt`);
     }
   };
@@ -119,20 +158,23 @@ export function HealthAnalyticsPage() {
             />
 
             {analysis && (
-              <div className="mt-6 p-4 bg-bonsai-green/10 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-bonsai-bark dark:text-white">
-                    Analysis Results
-                  </h3>
-                  <button
-                    onClick={handleDownload}
-                    className="text-sm text-bonsai-green hover:text-bonsai-moss transition-colors flex items-center gap-1"
-                  >
-                    <Info className="w-4 h-4" />
-                    <span>Download Analysis</span>
-                  </button>
+              <div className="mt-6 space-y-6">
+                <HealthScores scores={analysis.scores} />
+                <div className="p-4 bg-bonsai-green/10 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium text-bonsai-bark dark:text-white">
+                      Analysis Results
+                    </h3>
+                    <button
+                      onClick={handleDownload}
+                      className="text-sm text-bonsai-green hover:text-bonsai-moss transition-colors flex items-center gap-1"
+                    >
+                      <Info className="w-4 h-4" />
+                      <span>Download Analysis</span>
+                    </button>
+                  </div>
+                  <MarkdownContent content={analysis.text} />
                 </div>
-                <MarkdownContent content={analysis} />
               </div>
             )}
 
