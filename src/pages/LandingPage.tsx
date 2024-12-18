@@ -327,23 +327,7 @@ export function LandingPage() {
         </div>
       </div>
 
-      <div className="bg-bonsai-stone dark:bg-stone-900 border-t border-white/10 py-4">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-5 gap-4 text-white/80">
-            {FEATURES.map(feature => (
-              <button 
-                key={feature.id}
-                onClick={() => navigate(feature.path)}
-                className="flex flex-col items-center p-2 hover:bg-stone-700/80 dark:hover:bg-stone-800 rounded-lg transition-colors group"
-                disabled={loading}
-              >
-                <feature.icon className="w-7 h-7 text-bonsai-green group-hover:scale-110 transition-transform" />
-                <span className="text-center text-sm mt-1 line-clamp-1 dark:text-white/90">{feature.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }
