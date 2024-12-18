@@ -7,10 +7,10 @@ export function Footer() {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   const mainItems = [
-    { id: 'garden', name: 'My Bonsai Garden', icon: TreeDeciduous, path: '/dashboard' },
-    { id: 'diagnose', name: 'Diagnose', icon: Stethoscope, path: '/health-analytics' },
-    { id: 'coaching', name: 'Coaching', icon: MessageCircle, path: '/expert-coaching' },
-    { id: 'species', name: 'Species Identifier', icon: Leaf, path: '/species-identifier' },
+    { id: 'garden', name: 'Garden', icon: TreeDeciduous, path: '/dashboard' },
+    { id: 'diagnose', name: 'Health', icon: Stethoscope, path: '/health-analytics' },
+    { id: 'coaching', name: 'Coach', icon: MessageCircle, path: '/expert-coaching' },
+    { id: 'species', name: 'Identify', icon: Leaf, path: '/species-identifier' },
   ];
 
   const moreItems = [
@@ -43,7 +43,7 @@ export function Footer() {
             >
               <MoreHorizontal className="w-7 h-7 text-bonsai-green group-hover:scale-110 transition-transform" />
               <span className="text-center text-sm mt-1 line-clamp-1 dark:text-white/90">
-                More
+
               </span>
             </button>
 
