@@ -69,14 +69,17 @@ export function HealthAnalyticsPage() {
         }
 
         const data = await response.json();
+        console.log('Raw API Response:', data);
+        console.log('Response type:', typeof data);
+        console.log('Response analysis type:', typeof data.analysis);
+        if (typeof data.analysis === 'string') {
+          console.log('Analysis content:', data.analysis.substring(0, 100) + '...');
+        }
+
         if (data.error) {
           throw new Error(data.error);
         }
 
-        // Log the response to see what we're getting
-        console.log('API Response:', data);
-
-        // Parse the response - it might be a string that needs to be parsed
         let parsedData;
         try {
           // If data.analysis is a string containing JSON
