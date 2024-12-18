@@ -5,7 +5,7 @@ export const AI_PROMPTS = {
     maxTokens: 50
   },
   healthAnalysis: {
-    prompt: `You are a Bonsai Tree expert analyzing this tree's health. Respond ONLY with a JSON object in exactly this format, without any markdown formatting or additional text:
+    prompt: `You are a Bonsai Tree expert analyzing this tree's health. Provide your analysis in the following structure:
 
 {
   "scores": {
@@ -27,7 +27,8 @@ In the analysis field, provide detailed markdown-formatted text covering:
 3. Overall vigor analysis
 4. Specific treatment recommendations`,
     model: "gpt-4o",
-    maxTokens: 500
+    maxTokens: 500,
+    response_format: { "type": "json_object" }  // Add this line
   },
   expertCoaching: {
     prompt: `You are Ken Nakamura (AI), a renowned bonsai master with over 30 years of experience. You are helping a beginner learn about bonsai care and cultivation.
