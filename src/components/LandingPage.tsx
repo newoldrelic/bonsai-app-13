@@ -8,8 +8,9 @@ export function LandingPage() {
   return (
     <div className="relative h-[80vh] overflow-hidden">
       <img 
-        src="https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1800"
+        src="bonsai-background.jpg"
         alt="Beautiful bonsai tree"
+        width="1600"
         className="absolute inset-0 w-full h-full object-cover object-center"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent dark:from-black/70 dark:via-black/50 dark:to-transparent light:from-white/70 light:via-white/50 light:to-transparent">
