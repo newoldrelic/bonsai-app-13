@@ -5,28 +5,27 @@ export const AI_PROMPTS = {
     maxTokens: 50
   },
   healthAnalysis: {
-    prompt: `You are a Bonsai Tree expert. Analyze this bonsai tree's health conditions. Provide the following in JSON format:
+    prompt: `You are a Bonsai Tree expert analyzing this tree's health. Respond ONLY with a JSON object in exactly this format, without any markdown formatting or additional text:
 
-    1. Scores (0-5 scale, use decimals for precision):
-       - leafCondition: Score for overall leaf health
-       - diseaseAndPests: Score for absence of disease/pests (5 means no issues)
-       - overallVigor: Score for general tree health and vitality
-    
-    2. Provide detailed analysis for:
-       - Leaf condition and any issues
-       - Signs of disease or pests
-       - Overall vigor assessment
-       - Specific treatment recommendations
-    
-    Format response as:
-    {
-      "scores": {
-        "leafCondition": number,
-        "diseaseAndPests": number,
-        "overallVigor": number
-      },
-      "analysis": "detailed markdown formatted analysis"
-    }`,
+{
+  "scores": {
+    "leafCondition": <number 0-5>,
+    "diseaseAndPests": <number 0-5>,
+    "overallVigor": <number 0-5>
+  },
+  "analysis": "<detailed markdown analysis here>"
+}
+
+For the scores:
+- leafCondition: Rate overall leaf health (0=dead/missing, 5=perfect)
+- diseaseAndPests: Rate absence of issues (0=severe problems, 5=no issues)
+- overallVigor: Rate general health (0=very poor, 5=excellent)
+
+In the analysis field, provide detailed markdown-formatted text covering:
+1. Leaf condition assessment
+2. Disease/pest evaluation
+3. Overall vigor analysis
+4. Specific treatment recommendations`,
     model: "gpt-4o",
     maxTokens: 500
   },
