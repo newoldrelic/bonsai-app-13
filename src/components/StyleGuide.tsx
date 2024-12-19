@@ -82,12 +82,14 @@ export function StyleGuide() {
           <div className="flex">
             {BONSAI_STYLES.map((style) => (
               <div key={style.name} className="flex-[0_0_100%] min-w-0 pl-4">
-                <div className="card h-[600px] overflow-hidden">
-                  <img
-                    src={style.image}
-                    alt={style.name}
-                    className="w-full h-64 object-cover"
-                  />
+                <div className="card h-[600px]">
+                  <div className="overflow-hidden rounded-t-lg bg-stone-100 dark:bg-stone-800">
+                    <img
+                      src={style.image}
+                      alt={style.name}
+                      className="w-full h-80 md:h-96 object-contain"
+                    />
+                  </div>
                   <div className="p-6">
                     <div className="flex items-center space-x-3 mb-4">
                       <style.icon className="w-6 h-6 text-bonsai-green" />

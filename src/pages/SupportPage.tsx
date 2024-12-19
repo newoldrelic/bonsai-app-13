@@ -82,22 +82,13 @@ export function SupportPage() {
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4 flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-bonsai-green" />
-              <span>Quick Support</span>
+              <span>Support</span>
             </h2>
             <div className="prose prose-stone dark:prose-invert max-w-none">
               <p>
                 Having trouble with your bonsai or our app? Our support team is ready to help you.
                 We typically respond within 24 hours on business days.
               </p>
-              <div className="mt-4">
-                <a 
-                  href="mailto:support@bonsaiforbeginners.app"
-                  className="inline-flex items-center space-x-2 text-bonsai-green hover:text-bonsai-moss transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>support@bonsaiforbeginners.app</span>
-                </a>
-              </div>
             </div>
           </div>
 
@@ -255,6 +246,16 @@ export function SupportPage() {
           </div>
         </div>
       </div>
+
+      <div className="mt-4">
+                <a 
+                  href="mailto:support@bonsaiforbeginners.app"
+                  className="inline-flex items-center space-x-2 text-bonsai-green hover:text-bonsai-moss transition-colors"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>support@bonsaiforbeginners.app</span>
+                </a>
+              </div>
     </div>
   );
 }
