@@ -66,7 +66,7 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
   submitRequest: async (request: NewSupportRequest) => {
     try {
       set({ loading: true, error: null });
-  
+
       const newRequest = {
         ...request,
         status: 'pending' as const,
@@ -74,7 +74,7 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-  
+
       // Try to store in Firebase first
       await addDoc(collection(db, 'supportRequests'), newRequest);
       
@@ -101,3 +101,4 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
       logAnalyticsEvent('support_request_submit_error');
     }
   }
+}));
