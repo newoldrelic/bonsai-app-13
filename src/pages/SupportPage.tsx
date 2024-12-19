@@ -50,7 +50,7 @@ export function SupportPage() {
             </h2>
             <div className="prose prose-stone dark:prose-invert max-w-none">
               <p>
-                Having trouble with your bonsai or our app? Our support team is ready to help you.
+                Having trouble with our app? Our app support team is ready to help you.
                 We typically respond within 24 hours on business days.
               </p>
               <div className="mt-4">

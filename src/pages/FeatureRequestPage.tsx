@@ -1,5 +1,3 @@
-// pages/FeatureRequestPage.tsx
-
 import React, { useState, useEffect } from 'react';
 import { Lightbulb, ThumbsUp, Send, Crown, Loader2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -189,4 +187,25 @@ export function FeatureRequestPage() {
           {!user && (
             <div className="card p-6 bg-gradient-to-br from-bonsai-terra/10 to-bonsai-clay/10">
               <div className="flex items-start space-x-3">
-                <Crown className="w-5 h-5 text-bonsai-terra flex-shrink-
+                <Crown className="w-5 h-5 text-bonsai-terra flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-bonsai-terra font-medium">Premium Feature</p>
+                  <p className="text-sm text-stone-600 dark:text-stone-300 mt-1">
+                    Upgrade to submit and vote on feature requests. Help shape the future of our app!
+                  </p>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    className="mt-3 text-bonsai-terra hover:text-bonsai-clay transition-colors text-sm font-medium flex items-center space-x-2"
+                  >
+                    <span>View Pricing</span>
+                    <Crown className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
