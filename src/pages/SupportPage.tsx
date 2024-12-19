@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HelpCircle, Mail, MessageCircle, ExternalLink, FileQuestion, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { SUPPORT_FAQS } from '../config/faq';
 
 export function SupportPage() {
   const [formData, setFormData] = useState({
@@ -15,15 +16,12 @@ export function SupportPage() {
     e.preventDefault();
     setStatus('submitting');
     
-    // Create mailto URL with form data
     const mailtoUrl = `mailto:support@bonsaiforbeginners.app?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`
     )}`;
 
-    // Open default mail client
     window.location.href = mailtoUrl;
     
-    // Show success state briefly
     setStatus('success');
     setTimeout(() => {
       setStatus('idle');
@@ -34,6 +32,7 @@ export function SupportPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
+        {/* Header section remains the same */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <HelpCircle className="w-8 h-8 text-bonsai-green" />
@@ -45,10 +44,11 @@ export function SupportPage() {
         </div>
 
         <div className="grid gap-6">
+          {/* Quick Support section remains the same */}
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4 flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-bonsai-green" />
-              <span>Quick Support</span>
+              <span>Support</span>
             </h2>
             <div className="prose prose-stone dark:prose-invert max-w-none">
               <p>
@@ -162,52 +162,31 @@ export function SupportPage() {
                 </div>
               )}
             </form>
-          </div>
 
+          {/* Updated FAQ section using config */}
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4 flex items-center gap-2">
               <FileQuestion className="w-5 h-5 text-bonsai-green" />
               <span>Common Questions</span>
             </h2>
             <div className="space-y-4">
-              <details className="group">
-                <summary className="flex justify-between items-center cursor-pointer list-none p-3 bg-stone-50 dark:bg-stone-800 rounded-lg">
-                  <span className="font-medium">How do I enable notifications?</span>
-                  <span className="transform group-open:rotate-180 transition-transform">
-                    <ExternalLink className="w-4 h-4" />
-                  </span>
-                </summary>
-                <div className="mt-2 p-3 text-stone-600 dark:text-stone-300">
-                  Go to your tree's details page and look for the maintenance section. Toggle the notification switches for the types of reminders you want to receive.
-                </div>
-              </details>
-
-              <details className="group">
-                <summary className="flex justify-between items-center cursor-pointer list-none p-3 bg-stone-50 dark:bg-stone-800 rounded-lg">
-                  <span className="font-medium">How do I cancel my subscription?</span>
-                  <span className="transform group-open:rotate-180 transition-transform">
-                    <ExternalLink className="w-4 h-4" />
-                  </span>
-                </summary>
-                <div className="mt-2 p-3 text-stone-600 dark:text-stone-300">
-                  You can cancel your subscription at any time from your account settings. Your premium features will remain active until the end of your billing period.
-                </div>
-              </details>
-
-              <details className="group">
-                <summary className="flex justify-between items-center cursor-pointer list-none p-3 bg-stone-50 dark:bg-stone-800 rounded-lg">
-                  <span className="font-medium">Can I export my bonsai data?</span>
-                  <span className="transform group-open:rotate-180 transition-transform">
-                    <ExternalLink className="w-4 h-4" />
-                  </span>
-                </summary>
-                <div className="mt-2 p-3 text-stone-600 dark:text-stone-300">
-                  Yes! You can export your maintenance schedules to your calendar and download care guides as PDF files.
-                </div>
-              </details>
+              {SUPPORT_FAQS.map((faq, index) => (
+                <details key={index} className="group">
+                  <summary className="flex justify-between items-center cursor-pointer list-none p-3 bg-stone-50 dark:bg-stone-800 rounded-lg">
+                    <span className="font-medium">{faq.question}</span>
+                    <span className="transform group-open:rotate-180 transition-transform">
+                      <ExternalLink className="w-4 h-4" />
+                    </span>
+                  </summary>
+                  <div className="mt-2 p-3 text-stone-600 dark:text-stone-300">
+                    {faq.answer}
+                  </div>
+                </details>
+              ))}
             </div>
           </div>
 
+          {/* Emergency Care section remains the same */}
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4">Emergency Care</h2>
             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
