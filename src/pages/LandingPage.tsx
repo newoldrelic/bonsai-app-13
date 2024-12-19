@@ -3,125 +3,6 @@ import { ArrowRight, Plus, Gift, X, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useBonsaiStore } from '../store/bonsaiStore';
-import { FEATURES } from '../config/features';
-
-// notification test button
-//
-import { Bell } from 'lucide-react';
-import { notificationService } from '../services/notificationService';
-import { debug } from '../utils/debug';
-export function TestNotificationButton() {
-  const handleTestClick = async () => {
-    try {
-      debug.info('Testing notification...');
-      await notificationService.testNotification();
-    } catch (error) {
-      debug.error('Test notification failed:', error);
-    }
-  };
-
-  return (
-    <button
-      onClick={handleTestClick}
-      className="flex items-center space-x-2 px-4 py-2 bg-bonsai-green text-white rounded-lg hover:bg-bonsai-moss transition-colors"
-    >
-      <Bell className="w-4 h-4" />
-      <span>Test Notifications</span>
-    </button>
-  );
-}
-//import { TestNotificationButton } from './TestNotificationButton';
-// end notification test button
-
-// scheduled notification test button
-//import React from 'react';
-import { Clock } from 'lucide-react';
-//import { notificationService } from '../services/notificationService';
-//import { debug } from '../utils/debug';
-
-export function TestScheduledNotificationButton() {
-  const handleTestClick = async () => {
-    try {
-      debug.info('Testing scheduled notification...');
-      await notificationService.testScheduledNotification();
-    } catch (error) {
-      debug.error('Test scheduled notification failed:', error);
-    }
-  };
-
-  return (
-    <button
-      onClick={handleTestClick}
-      className="flex items-center space-x-2 px-4 py-2 bg-bonsai-green text-white rounded-lg hover:bg-bonsai-moss transition-colors"
-    >
-      <Clock className="w-4 h-4" />
-      <span>Test Scheduled Notification (1min)</span>
-    </button>
-  );
-}
-// end scheduled notification test button
-
-// bare bones notification to test browser
-//import React from 'react';
-
-export function NotificationDebugButton() {
-  const testBasicNotification = () => {
-    console.log('Testing basic notification');
-    new Notification('Basic Test', {
-      body: 'Direct browser notification'
-    });
-  };
-
-  const testServiceWorkerNotification = async () => {
-    console.log('Testing service worker notification');
-    const registration = await navigator.serviceWorker.getRegistration();
-    if (registration) {
-      await registration.showNotification('Service Worker Test', {
-        body: 'Via service worker'
-      });
-    }
-  };
-
-  const checkNotificationStatus = () => {
-    console.log('=== Notification Status ===');
-    console.log('Notification API available:', 'Notification' in window);
-    console.log('Permission:', Notification.permission);
-    console.log('Service Worker API available:', 'serviceWorker' in navigator);
-    navigator.serviceWorker.getRegistration().then(registration => {
-      console.log('Service Worker registered:', !!registration);
-      if (registration) {
-        console.log('Service Worker state:', registration.active?.state);
-      }
-    });
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="text-sm text-gray-600">Notification Debug Panel</div>
-      <div className="space-x-2">
-        <button
-          onClick={testBasicNotification}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-        >
-          Test Basic
-        </button>
-        <button
-          onClick={testServiceWorkerNotification}
-          className="px-4 py-2 bg-green-500 text-white rounded-lg"
-        >
-          Test Service Worker
-        </button>
-        <button
-          onClick={checkNotificationStatus}
-          className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
-        >
-          Check Status
-        </button>
-      </div>
-    </div>
-  );
-}
-// end bare bones button for browser
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -141,11 +22,8 @@ export function LandingPage() {
     if (!showPasswordField) {
       setCheckingEmail(true);
       try {
-        console.log('Checking email:', email);
         const exists = await checkEmailExists(email);
-        console.log('Email exists?', exists);
         setIsNewUser(!exists);
-        console.log('Setting isNewUser to:', !exists);
         setShowPasswordField(true);
       } catch (error) {
         console.error('Error checking email:', error);
@@ -157,7 +35,6 @@ export function LandingPage() {
 
     if (!email || !password) return;
     
-    console.log('Attempting auth with isNewUser:', isNewUser);
     if (isNewUser) {
       await createAccount(email, password);
     } else {
@@ -170,17 +47,18 @@ export function LandingPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-stone-100 dark:bg-stone-900">
-      <div className="relative flex-1 min-h-0">
+    <div className="min-h-screen flex">
+      <div className="relative w-full flex items-center">
         <img 
-          src="bonsai_background.jpg"
+          src="bonsai-background.jpg"
           alt="Beautiful bonsai tree"
-          width="1600"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent dark:from-black/90 dark:via-black/70 dark:to-black/30">
-          <div className="container mx-auto px-4 h-full flex flex-col">
-            <div className="flex-1 flex flex-col justify-center max-w-2xl">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent dark:from-black/90 dark:via-black/70 dark:to-black/30" />
+        
+        <div className="relative w-full z-10">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl">
               {!user && showGiftSticker && (
                 <div className="absolute top-8 right-8 md:right-12 transform rotate-12 animate-bounce">
                   <div className="relative group">
@@ -214,12 +92,15 @@ export function LandingPage() {
                 </div>
               )}
 
-              <h1 className="text-white dark:text-white mt-4">
-                <span className="block text-6xl md:text-7xl lg:text-8xl font-bold leading-none">BONSAI</span>
-                <span className="block text-3xl md:text-4xl lg:text-5xl font-medium mt-1">FOR BEGINNERS</span>
+              <h1 className="text-white dark:text-white">
+                <span className="block text-5xl md:text-7xl lg:text-8xl font-bold leading-none">BONSAI</span>
+                <span className="block text-2xl md:text-4xl lg:text-5xl font-medium mt-1">FOR BEGINNERS</span>
               </h1>
+              
               <p className="text-white/90 dark:text-white/90 text-base md:text-lg leading-relaxed max-w-xl mt-3">
-                Your personal guide to the art of bonsai cultivation. Track, learn, and grow with expert guidance from <a href="https://www.amazon.com/stores/author/B0DM2F226F/about" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80">Ken Nakamura</a>, author of <a href="https://www.amazon.com/dp/1917554109" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80">Bonsai for Beginners</a>.
+                Your personal guide to the art of bonsai cultivation. Track, learn, and grow with expert guidance from 
+                <a href="https://www.amazon.com/stores/author/B0DM2F226F/about" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80"> Ken Nakamura</a>, 
+                author of <a href="https://www.amazon.com/dp/1917554109" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80">Bonsai for Beginners</a>.
               </p>
               
               {!user ? (
@@ -307,7 +188,6 @@ export function LandingPage() {
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                   </button>
-                  
 
                   {trees.length === 0 && (
                     <button 
@@ -326,8 +206,6 @@ export function LandingPage() {
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }

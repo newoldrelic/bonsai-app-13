@@ -6,14 +6,15 @@ export function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="fixed inset-0">
-      <img 
-        src="bonsai-background.jpg"
-        alt="Beautiful bonsai tree"
-        className="absolute inset-0 w-full h-full object-cover object-center"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent dark:from-black/70 dark:via-black/50 dark:to-transparent light:from-white/70 light:via-white/50 light:to-transparent">
-        <div className="absolute inset-0 flex items-center justify-center">
+    <div className="min-h-screen flex">
+      <div className="relative w-full flex items-center">
+        <img 
+          src="bonsai-background.jpg"
+          alt="Beautiful bonsai tree"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-transparent dark:from-black/70 dark:via-black/50 dark:to-transparent light:from-white/70 light:via-white/50 light:to-transparent" />
+        <div className="relative w-full z-10">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl">
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4">

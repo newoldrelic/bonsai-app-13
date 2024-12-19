@@ -74,23 +74,13 @@ export function SupportPage() {
             <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">Support</h1>
           </div>
           <p className="text-gray-600 dark:text-gray-300">
-            Get help with your bonsai care journey. We're here to assist you.
+          Having trouble with your bonsai or our app? Our support team is ready to help you.
+                We typically respond within 24 hours on business days.
           </p>
         </div>
 
         <div className="grid gap-6">
-          <div className="card p-6">
-            <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4 flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-bonsai-green" />
-              <span>Support</span>
-            </h2>
-            <div className="prose prose-stone dark:prose-invert max-w-none">
-              <p>
-                Having trouble with your bonsai or our app? Our support team is ready to help you.
-                We typically respond within 24 hours on business days.
-              </p>
-            </div>
-          </div>
+          
 
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4 flex items-center gap-2">
