@@ -66,7 +66,7 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
   submitRequest: async (request: NewSupportRequest) => {
     try {
       set({ loading: true, error: null });
-
+  
       const newRequest = {
         ...request,
         status: 'pending' as const,
@@ -74,16 +74,11 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
-
+  
+      // Try to store in Firebase first
       await addDoc(collection(db, 'supportRequests'), newRequest);
-
-      // Create mailto URL for immediate email
-      const mailtoUrl = `mailto:support@bonsaiforbeginners.app?subject=${encodeURIComponent(request.subject)}&body=${encodeURIComponent(
-        `Name: ${request.name}\nEmail: ${request.email}\n\n${request.message}`
-      )}`;
-      window.location.href = mailtoUrl;
       
-      // Reload requests if user is authenticated
+      // If successful, reload requests if user is authenticated
       if (auth.currentUser) {
         await get().loadUserRequests();
       }
@@ -92,11 +87,17 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
       logAnalyticsEvent('support_request_submitted');
     } catch (error) {
       console.error('Error submitting support request:', error);
+      
+      // If Firebase storage failed, fall back to email
+      const mailtoUrl = `mailto:support@bonsaiforbeginners.app?subject=${encodeURIComponent(request.subject)}&body=${encodeURIComponent(
+        `Name: ${request.name}\nEmail: ${request.email}\n\n${request.message}`
+      )}`;
+      window.location.href = mailtoUrl;
+      
       set({ 
-        error: 'Failed to submit support request. Please try again.',
+        error: 'Failed to submit support request. Opening email client as fallback.',
         loading: false 
       });
       logAnalyticsEvent('support_request_submit_error');
     }
   }
-}));
