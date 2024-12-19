@@ -13,7 +13,7 @@ const BONSAI_STYLES = [
       'Gradual taper from base to apex',
       'First branch at about 1/3 height of trunk'
     ],
-    image: 'https://images.unsplash.com/photo-1609142621730-db3293839541?w=800',
+    image: '/styles/chokkan.jpg',
     icon: TreeDeciduous
   },
   {
@@ -25,7 +25,7 @@ const BONSAI_STYLES = [
       'Balanced branch arrangement',
       'More dynamic than formal upright'
     ],
-    image: 'https://images.unsplash.com/photo-1612825173281-9a193378527e?w=800',
+    image: '/styles/moyogi.jpg',
     icon: Wind
   },
   {
@@ -37,7 +37,7 @@ const BONSAI_STYLES = [
       'Branches grow horizontally',
       'Creates dynamic tension'
     ],
-    image: 'https://images.unsplash.com/photo-1626019240671-c484d4211529?w=800',
+    image: '/styles/shakan.jpg',
     icon: Wind
   },
   {
@@ -49,7 +49,7 @@ const BONSAI_STYLES = [
       'Often needs deeper pot for stability',
       'Creates dramatic visual impact'
     ],
-    image: 'https://images.unsplash.com/photo-1612911969147-76f87ed6d91f?w=800',
+    image: '/styles/kengai.jpg',
     icon: Mountain
   },
   {
@@ -61,7 +61,7 @@ const BONSAI_STYLES = [
       'Balanced root system',
       'Natural, graceful appearance'
     ],
-    image: 'https://images.unsplash.com/photo-1604507981841-37a7d0c522f2?w=800',
+    image: '/styles/han-kengai.jpg',
     icon: Sprout
   }
 ];
