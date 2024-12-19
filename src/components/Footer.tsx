@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TreeDeciduous, Stethoscope, MessageCircle, Leaf } from 'lucide-react';
+import { TreeDeciduous, Stethoscope, MessageCircle, Leaf, Compass } from 'lucide-react';
 
 export function Footer() {
   const navigate = useNavigate();
@@ -10,12 +10,13 @@ export function Footer() {
     { id: 'diagnose', name: 'Health', icon: Stethoscope, path: '/health-analytics' },
     { id: 'coaching', name: 'Coach', icon: MessageCircle, path: '/expert-coaching' },
     { id: 'species', name: 'Identify', icon: Leaf, path: '/species-identifier' },
+    { id: 'guide', name: 'Styles', icon: Compass, path: '/guide' },
   ];
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-bonsai-stone dark:bg-stone-900 border-t border-white/10 py-4 z-50">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-4 gap-2 text-white/80">
+        <div className="grid grid-cols-5 gap-2 text-white/80">
           {mainItems.map(item => (
             <button 
               key={item.id}

@@ -12,14 +12,6 @@ export interface Feature {
 
 export const FEATURES: Feature[] = [
   {
-    id: 'style-guide',
-    name: 'Style Guide',
-    description: 'Learn about traditional bonsai styles and techniques',
-    path: '/guide',
-    icon: Compass,
-    isPremium: false
-  },
-  {
     id: 'support',
     name: 'Support',
     description: 'Get help with your bonsai care journey',
