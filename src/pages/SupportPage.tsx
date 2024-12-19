@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HelpCircle, Mail, MessageCircle, ExternalLink, FileQuestion, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { SUPPORT_FAQS } from '../config/faq';
+import { SUPPORT_FAQS } from '../config/support-config';
 
 export function SupportPage() {
   const [formData, setFormData] = useState({
@@ -32,7 +32,6 @@ export function SupportPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-3xl mx-auto">
-        {/* Header section remains the same */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <HelpCircle className="w-8 h-8 text-bonsai-green" />
@@ -44,11 +43,10 @@ export function SupportPage() {
         </div>
 
         <div className="grid gap-6">
-          {/* Quick Support section remains the same */}
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4 flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-bonsai-green" />
-              <span>Support</span>
+              <span>Quick Support</span>
             </h2>
             <div className="prose prose-stone dark:prose-invert max-w-none">
               <p>
@@ -162,8 +160,8 @@ export function SupportPage() {
                 </div>
               )}
             </form>
+          </div>
 
-          {/* Updated FAQ section using config */}
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4 flex items-center gap-2">
               <FileQuestion className="w-5 h-5 text-bonsai-green" />
@@ -186,7 +184,6 @@ export function SupportPage() {
             </div>
           </div>
 
-          {/* Emergency Care section remains the same */}
           <div className="card p-6">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4">Emergency Care</h2>
             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
