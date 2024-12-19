@@ -335,24 +335,36 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 pb-24 z-50">
       <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[calc(100vh-130px)] flex flex-col">
-   {/* Header - make it more compact */}
-        <div className="flex-shrink-0 flex items-center justify-between p-3 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 rounded-t-xl">
-          <div className="flex items-center space-x-2">
+        {/* Header */}
+        <div className="flex-shrink-0 flex flex-col items-center gap-3 p-3 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 rounded-t-xl">
+          <div className="w-full flex items-center justify-between">
             <h2 className="text-lg font-semibold text-bonsai-bark dark:text-white">Add New Bonsai</h2>
-            <span className="text-sm text-stone-500 dark:text-stone-400">
-              Step {currentStep + 1} of {FORM_STEPS.length}
-            </span>
+            <button
+              onClick={onClose}
+              className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-stone-500 dark:text-stone-400" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5 text-stone-500 dark:text-stone-400" />
-          </button>
+          
+          {/* Step indicators */}
+          <div className="flex items-center gap-2">
+            {FORM_STEPS.map((step, index) => (
+              <div 
+                key={step.id}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  index === currentStep 
+                    ? 'bg-bonsai-green' 
+                    : 'bg-stone-200 dark:bg-stone-700'
+                }`}
+                title={step.label}
+              />
+            ))}
+          </div>
         </div>
-  
+   
         <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
-          {/* Carousel area - adjust padding and overflow */}
+          {/* Carousel area */}
           <div className="flex-1 min-h-0 overflow-auto">
             <div className="h-full" ref={emblaRef}>
               <div className="flex h-full">
@@ -364,8 +376,8 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
               </div>
             </div>
           </div>
-  
-          {/* Navigation - make it more compact */}
+   
+          {/* Navigation */}
           <div className="flex-shrink-0 p-3 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between mt-auto">
             <button
               type="button"
@@ -376,7 +388,7 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
               <ArrowLeft className="w-5 h-5" />
               <span>Previous</span>
             </button>
-  
+   
             {currentStep === FORM_STEPS.length - 1 ? (
               <button
                 type="submit"
@@ -398,7 +410,7 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
           </div>
         </form>
       </div>
-  
+   
       {showSpeciesIdentifier && (
         <SpeciesIdentifierModal
           onClose={() => setShowSpeciesIdentifier(false)}
@@ -407,5 +419,5 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
         />
       )}
     </div>
-  );
+   );
 }
