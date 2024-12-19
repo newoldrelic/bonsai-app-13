@@ -21,6 +21,8 @@ import { HealthAnalyticsPage } from './pages/HealthAnalyticsPage';
 import { CareGuidePage } from './pages/CareGuidePage';
 import { ExpertCoachingPage } from './pages/ExpertCoachingPage';
 import { VoiceChatPage } from './pages/VoiceChatPage';
+import { SupportPage } from './pages/SupportPage';
+import { FeatureRequestPage } from './pages/FeatureRequestPage';
 import { logAnalyticsEvent } from './config/firebase';
 import { debug } from './utils/debug';
 import { registerServiceWorker } from './utils/notifications';
@@ -286,6 +288,8 @@ export default function App() {
               <VoiceChatPage />
             </PremiumRoute>
           } />
+          <Route path="/support" element={<SupportPage />} />
+          <Route path="/feature-requests" element={<FeatureRequestPage />} />
         </Routes>
         <AuthError />
         <CookieConsent />

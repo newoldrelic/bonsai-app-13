@@ -1,4 +1,4 @@
-import { Menu as MenuIcon, TreeDeciduous, LogOut, Crown, Home, CreditCard, LogIn } from 'lucide-react';
+import { Menu as MenuIcon, TreeDeciduous, LogOut, Crown, Home, CreditCard, LogIn, LifeBuoy, Lightbulb } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';

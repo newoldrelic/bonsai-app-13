@@ -1,4 +1,4 @@
-import { Book, Leaf, Stethoscope, TreeDeciduous, Home, CreditCard, Compass, PhoneCall } from 'lucide-react';
+import { Book, Leaf, Stethoscope, TreeDeciduous, Home, CreditCard, Compass, PhoneCall, HelpCircle, Lightbulb } from 'lucide-react';
 import type { IconType } from 'lucide-react';
 
 export interface Feature {
@@ -12,22 +12,6 @@ export interface Feature {
 
 export const FEATURES: Feature[] = [
   {
-    id: 'collection',
-    name: 'My Bonsai Garden',
-    description: 'Manage and track your bonsai collection',
-    path: '/dashboard',
-    icon: TreeDeciduous,
-    isPremium: false
-  },
-  {
-    id: 'species-identifier',
-    name: 'Species Identifier',
-    description: 'Instantly identify your bonsai species using AI technology (3 free uses)',
-    path: '/species-identifier',
-    icon: Leaf,
-    isPremium: false
-  },
-  {
     id: 'style-guide',
     name: 'Style Guide',
     description: 'Learn about traditional bonsai styles and techniques',
@@ -36,27 +20,19 @@ export const FEATURES: Feature[] = [
     isPremium: false
   },
   {
-    id: 'health-analytics',
-    name: 'Dynamic Health Analytics',
-    description: 'Get instant expert analysis and personalized treatment recommendations',
-    path: '/health-analytics',
-    icon: Stethoscope,
-    isPremium: true
+    id: 'support',
+    name: 'Support',
+    description: 'Get help with your bonsai care journey',
+    path: '/support',
+    icon: HelpCircle,
+    isPremium: false
   },
   {
-    id: 'care-guide',
-    name: 'Tailored Care Guide',
-    description: 'Expert care instructions customized to your tree and location',
-    path: '/care-guide',
-    icon: Book,
-    isPremium: true
-  },
-  {
-    id: 'expert-coaching',
-    name: 'Expert Coaching',
-    description: 'One-on-one video calls and chat support with bonsai masters',
-    path: '/expert-coaching',
-    icon: PhoneCall,
-    isPremium: true
+    id: 'feature-requests',
+    name: 'Feature Requests',
+    description: 'Suggest and vote on new features',
+    path: '/feature-requests',
+    icon: Lightbulb,
+    isPremium: false
   }
 ];
