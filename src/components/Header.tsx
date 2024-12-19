@@ -1,10 +1,9 @@
-import { Menu as MenuIcon, TreeDeciduous, LogOut, Crown, Home, CreditCard, LogIn, LifeBuoy, Lightbulb } from 'lucide-react';
+import { Menu as MenuIcon, TreeDeciduous, LogOut, Crown, Home, CreditCard, Settings, MessageSquare } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '../store/authStore';
 import { useSubscriptionStore } from '../store/subscriptionStore';
-import { FEATURES } from '../config/features';
 
 export function Header() {
   const [showMenu, setShowMenu] = useState(false);
@@ -17,14 +16,9 @@ export function Header() {
 
   const menuItems = [
     { id: 'home', label: 'Home', path: '/', icon: Home },
-    { id: 'pricing', label: 'Pricing', path: '/pricing', icon: CreditCard },
-    ...FEATURES.map(feature => ({
-      id: feature.id,
-      label: feature.name,
-      path: feature.path,
-      icon: feature.icon,
-      premium: feature.isPremium
-    }))
+    { id: 'support', label: 'Support', path: '/support', icon: Settings },
+    { id: 'feature-requests', label: 'Feature Requests', path: '/feature-requests', icon: MessageSquare },
+    { id: 'pricing', label: 'Pricing', path: '/pricing', icon: CreditCard }
   ];
 
   const handleLogout = async () => {
@@ -112,8 +106,7 @@ export function Header() {
                   onClick={signInWithGoogle}
                   className="flex items-center space-x-1 px-2 py-1.5 sm:px-4 sm:py-2 bg-bonsai-green hover:bg-bonsai-moss text-white rounded-lg transition-colors text-xs sm:text-base"
                 >
-                  <LogIn className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>Sign In</span>
+                  Sign In
                 </button>
               )}
               <ThemeToggle />
@@ -146,9 +139,6 @@ export function Header() {
                 {item.icon && <item.icon className="w-4 h-4 text-bonsai-green mr-2 flex-shrink-0" />}
                 <span className="truncate">{item.label}</span>
               </div>
-              {item.premium && (
-                <Crown className="w-4 h-4 text-bonsai-terra ml-2 flex-shrink-0" />
-              )}
             </button>
           ))}
         </div>
