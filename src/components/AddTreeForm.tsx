@@ -334,8 +334,8 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-4xl">
-        <div className="flex items-center justify-between p-4 border-b border-stone-200 dark:border-stone-700">
+      <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 rounded-t-xl">
           <div className="flex items-center space-x-2">
             <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white">Add New Bonsai</h2>
             <span className="text-sm text-stone-500 dark:text-stone-400">
@@ -349,53 +349,53 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
             <X className="w-5 h-5 text-stone-500 dark:text-stone-400" />
           </button>
         </div>
-
-        <form onSubmit={handleSubmit}>
-        <div className="relative">
-  <div className="overflow-hidden min-h-[500px]" ref={emblaRef}>
-    <div className="flex">
-      {FORM_STEPS.map((step) => (
-        <div key={step.id} className="flex-[0_0_100%] min-w-0 p-8">
-          {renderStep(step.id)}
-        </div>
-      ))}
-    </div>
-  </div>
-</div>
-
-<div className="p-4 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between">
-  <button
-    type="button"
-    onClick={scrollPrev}
-    disabled={currentStep === 0}
-    className="flex items-center space-x-2 px-4 py-2 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg transition-colors disabled:opacity-50"
-  >
-    <ArrowLeft className="w-5 h-5" />
-    <span>Previous</span>
-  </button>
-
-  {currentStep === FORM_STEPS.length - 1 ? (
-    <button
-      type="submit"
-      disabled={submitting}
-      className="flex items-center space-x-2 px-6 py-2 bg-bonsai-green text-white rounded-lg hover:bg-bonsai-moss transition-colors disabled:opacity-50"
-    >
-      <span>{submitting ? 'Adding Tree...' : 'Add Tree'}</span>
-    </button>
-  ) : (
-    <button
-      type="button"
-      onClick={scrollNext}
-      className="flex items-center space-x-2 px-4 py-2 text-bonsai-green hover:bg-bonsai-green/10 rounded-lg transition-colors"
-    >
-      <span>Next</span>
-      <ArrowRight className="w-5 h-5" />
-    </button>
-  )}
-</div>
+  
+        <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
+          <div className="flex-1 overflow-hidden">
+            <div className="h-full" ref={emblaRef}>
+              <div className="flex h-full">
+                {FORM_STEPS.map((step) => (
+                  <div key={step.id} className="flex-[0_0_100%] min-w-0 p-4 md:p-8">
+                    {renderStep(step.id)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+  
+          <div className="flex-shrink-0 p-4 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={scrollPrev}
+              disabled={currentStep === 0}
+              className="flex items-center space-x-2 px-4 py-2 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span>Previous</span>
+            </button>
+  
+            {currentStep === FORM_STEPS.length - 1 ? (
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex items-center space-x-2 px-6 py-2 bg-bonsai-green text-white rounded-lg hover:bg-bonsai-moss transition-colors disabled:opacity-50"
+              >
+                <span>{submitting ? 'Adding Tree...' : 'Add Tree'}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={scrollNext}
+                className="flex items-center space-x-2 px-4 py-2 text-bonsai-green hover:bg-bonsai-green/10 rounded-lg transition-colors"
+              >
+                <span>Next</span>
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </form>
       </div>
-
+  
       {showSpeciesIdentifier && (
         <SpeciesIdentifierModal
           onClose={() => setShowSpeciesIdentifier(false)}
