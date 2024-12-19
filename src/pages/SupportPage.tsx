@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { HelpCircle, Mail, MessageCircle, ExternalLink, FileQuestion, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { SUPPORT_FAQS } from '../config/support-config';
+import { SUPPORT_FAQS } from '../config/faq';
 
 export function SupportPage() {
   const [formData, setFormData] = useState({
