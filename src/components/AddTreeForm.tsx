@@ -181,8 +181,8 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
     switch (step) {
       case 'name':
         return (
-          <div className="form-group h-full flex flex-col justify-center items-center">
-            <label htmlFor="name" className="form-label text-xl mb-4">What's your tree's name?</label>
+          <div className="form-group text-center">
+            <label htmlFor="name" className="form-label text-xl mb-4">Name your Bonsai tree...</label>
             <input
               type="text"
               id="name"
@@ -195,12 +195,12 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
             />
           </div>
         );
-
+  
       case 'photo':
         return (
-          <div className="h-full flex flex-col justify-center items-center space-y-6">
-            <label className="form-label text-xl">Add a photo of your tree</label>
-            <div className="w-full max-w-md">
+          <div className="form-group text-center">
+            <label className="form-label text-xl mb-4">Add a photo of your tree</label>
+            <div className="w-full">
               <ImageUpload 
                 onImageCapture={handleImageCapture}
                 onError={handleImageError}
@@ -239,18 +239,11 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
             </div>
           </div>
         );
-
-      case 'species':
-        return (
-          <div className="h-full flex flex-col justify-center items-center space-y-6">
-            <div className="form-group w-full max-w-md">
-              <div className="flex items-center justify-between mb-4">
-                <label htmlFor="species" className="form-label text-xl">What species is your tree?</label>
-                <SpeciesIdentifierLink
-                  hasUploadedImage={formData.images.length > 0}
-                  onClick={() => setShowSpeciesIdentifier(true)}
-                />
-              </div>
+  
+        case 'species':
+          return (
+            <div className="form-group text-center">
+              <label htmlFor="species" className="form-label text-xl mb-4">What species is your tree?</label>
               <input
                 type="text"
                 id="species"
@@ -260,73 +253,72 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
                 className="form-input text-center text-xl"
                 placeholder="e.g., Japanese Maple"
               />
+              <div className="mt-4 flex justify-center">
+                <SpeciesIdentifierLink
+                  hasUploadedImage={formData.images.length > 0}
+                  onClick={() => setShowSpeciesIdentifier(true)}
+                />
+              </div>
             </div>
-          </div>
-        );
-
-      case 'style':
-        return (
-          <div className="h-full flex flex-col justify-center items-center space-y-6">
-            <label className="form-label text-xl">Select your tree's style</label>
-            <div className="w-full max-w-2xl">
-              <StyleSelector
-                value={formData.style}
-                onChange={(style) => setFormData({ ...formData, style })}
-              />
-            </div>
-          </div>
-        );
-
+          );
+  
+          case 'style':
+  return (
+    <div className="form-group text-center">
+      <label className="form-label text-xl mb-2">Select your tree's style</label>
+      <div className="w-full scale-75 md:scale-100"> {/* Added scaling for mobile */}
+        <StyleSelector
+          value={formData.style}
+          onChange={(style) => setFormData({ ...formData, style })}
+        />
+      </div>
+    </div>
+  );
+  
       case 'date':
         return (
-          <div className="h-full flex flex-col justify-center items-center space-y-6">
-            <div className="form-group w-full max-w-md">
-              <label htmlFor="dateAcquired" className="form-label text-xl mb-4">When did you get your tree?</label>
-              <input
-                type="date"
-                id="dateAcquired"
-                required
-                value={formData.dateAcquired}
-                onChange={(e) => setFormData({ ...formData, dateAcquired: e.target.value })}
-                className="form-input text-center text-xl"
-              />
-            </div>
+          <div className="form-group text-center">
+            <label htmlFor="dateAcquired" className="form-label text-xl mb-4">When did you get your tree?</label>
+            <input
+              type="date"
+              id="dateAcquired"
+              required
+              value={formData.dateAcquired}
+              onChange={(e) => setFormData({ ...formData, dateAcquired: e.target.value })}
+              className="form-input text-center text-xl"
+            />
           </div>
         );
-
+  
       case 'notes':
         return (
-          <div className="h-full flex flex-col justify-center items-center space-y-6">
-            <div className="form-group w-full max-w-md">
-              <label htmlFor="notes" className="form-label text-xl mb-4">Any additional notes?</label>
-              <textarea
-                id="notes"
-                rows={4}
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="form-input text-center"
-                placeholder="Add any notes about your bonsai..."
-              />
-            </div>
+          <div className="form-group text-center">
+            <label htmlFor="notes" className="form-label text-xl mb-4">Any additional notes?</label>
+            <textarea
+              id="notes"
+              rows={4}
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              className="form-input text-center"
+              placeholder="Add any notes about your bonsai..."
+            />
           </div>
         );
-
+  
       case 'maintenance':
         return (
-          <div className="h-full flex flex-col justify-center items-center overflow-y-auto">
-            <div className="w-full max-w-2xl">
-              <MaintenanceSection
-                notifications={formData.notifications}
-                notificationTime={formData.notificationSettings}
-                onNotificationChange={handleNotificationChange}
-                onNotificationTimeChange={handleNotificationTimeChange}
-                addToCalendar={addToCalendar}
-                onAddToCalendarChange={setAddToCalendar}
-              />
-            </div>
+          <div className="form-group">
+            <MaintenanceSection
+              notifications={formData.notifications}
+              notificationTime={formData.notificationSettings}
+              onNotificationChange={handleNotificationChange}
+              onNotificationTimeChange={handleNotificationTimeChange}
+              addToCalendar={addToCalendar}
+              onAddToCalendarChange={setAddToCalendar}
+            />
           </div>
         );
-
+  
       default:
         return null;
     }
@@ -334,7 +326,7 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 pb-24 z-50">
-      <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[calc(100vh-130px)] flex flex-col">
+      <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[calc(100vh-200px)] flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 flex flex-col items-center gap-3 p-3 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 rounded-t-xl">
           <div className="w-full flex items-center justify-between">
@@ -362,13 +354,14 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
           </div>
         </div>
    
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-          <div className="flex-1">
+        <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
+          {/* Carousel area with constrained height */}
+          <div className="min-h-0 flex-1 overflow-y-auto">
             <div ref={emblaRef}>
               <div className="flex">
                 {FORM_STEPS.map((step) => (
-                  <div key={step.id} className="flex-[0_0_100%] min-w-0 p-3 flex items-center justify-center">
-                    <div className="w-full max-w-md">
+                  <div key={step.id} className="flex-[0_0_100%] min-w-0 p-3 flex justify-center">
+                    <div className="w-full max-w-md pt-">
                       {renderStep(step.id)}
                     </div>
                   </div>
@@ -377,7 +370,8 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
             </div>
           </div>
    
-          <div className="flex-shrink-0 p-3 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between">
+          {/* Navigation - pushed to bottom */}
+          <div className="flex-shrink-0 mt-auto p-3 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between">
             <button
               type="button"
               onClick={scrollPrev}

@@ -192,17 +192,17 @@ export function LandingPage() {
                       <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                     </button>
 
-                    {trees.length === 0 && (
+                    
                       <button 
                         onClick={() => navigate('/dashboard', { state: { showAddForm: true } })}
                         className="btn border-2 border-white text-white hover:bg-white hover:text-bonsai-stone text-center group px-6 py-2 rounded-full"
                       >
                         <span className="flex items-center justify-center space-x-2">
-                          <span>Add Your First Tree</span>
+                          <span>Add a Tree to Your Garden</span>
                           <Plus className="w-5 h-5 transform group-hover:rotate-90 transition-transform" />
                         </span>
                       </button>
-                    )}
+                    
                   </div>
                 )}
               </div>
