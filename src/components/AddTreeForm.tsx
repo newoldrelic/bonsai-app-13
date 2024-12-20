@@ -347,7 +347,6 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
             </button>
           </div>
           
-          {/* Step indicators */}
           <div className="flex items-center gap-2">
             {FORM_STEPS.map((step, index) => (
               <div 
@@ -363,22 +362,22 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
           </div>
         </div>
    
-        <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
-          {/* Carousel area */}
-          <div className="flex-1 min-h-0 overflow-auto">
-            <div className="h-full" ref={emblaRef}>
-              <div className="flex h-full">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+          <div className="flex-1">
+            <div ref={emblaRef}>
+              <div className="flex">
                 {FORM_STEPS.map((step) => (
-                  <div key={step.id} className="flex-[0_0_100%] min-w-0 p-3">
-                    {renderStep(step.id)}
+                  <div key={step.id} className="flex-[0_0_100%] min-w-0 p-3 flex items-center justify-center">
+                    <div className="w-full max-w-md">
+                      {renderStep(step.id)}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
    
-          {/* Navigation */}
-          <div className="flex-shrink-0 p-3 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between mt-auto">
+          <div className="flex-shrink-0 p-3 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between">
             <button
               type="button"
               onClick={scrollPrev}
