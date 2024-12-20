@@ -1,21 +1,20 @@
+// AddTreeForm.tsx
 import React, { useState, useCallback } from 'react';
-import { X, AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { BonsaiStyle } from '../types';
-import { ImageUpload } from './ImageUpload';
+import { TreeFormSteps } from './TreeFormSteps';
+import { TreeFormHeader } from './TreeFormHeader';
+import { TreeFormNavigation } from './TreeFormNavigation';
 import { SpeciesIdentifierModal } from './SpeciesIdentifierModal';
-import { SpeciesIdentifierLink } from './SpeciesIdentifierLink';
-import { StyleSelector } from './StyleSelector';
-import { MaintenanceSection } from './MaintenanceSection';
 import { generateMaintenanceEvents, downloadCalendarFile } from '../utils/calendar';
-import { requestNotificationPermission, areNotificationsEnabled } from '../utils/notifications';
-import { useSubscriptionStore } from '../store/subscriptionStore';
+import { areNotificationsEnabled } from '../utils/notifications';
 import { notificationService } from '../services/notificationService';
 import { debug } from '../utils/debug';
 
 interface AddTreeFormProps {
   onClose: () => void;
   onSubmit: (data: any, isSubscribed: boolean) => Promise<any>;
+  isSubscribed: boolean;
 }
 
 const FORM_STEPS = [
@@ -28,13 +27,13 @@ const FORM_STEPS = [
   { id: 'maintenance', label: 'Maintenance Schedule' }
 ];
 
-export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
+export function AddTreeForm({ onClose, onSubmit, isSubscribed }: AddTreeFormProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     draggable: false,
     loop: false 
   });
+  
   const [currentStep, setCurrentStep] = useState(0);
-
   const [formData, setFormData] = useState({
     name: '',
     species: '',
@@ -60,10 +59,6 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
   const [imageError, setImageError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const { getCurrentPlan } = useSubscriptionStore();
-  const currentPlan = getCurrentPlan();
-  const isSubscribed = currentPlan.id !== 'hobby';
-
   const scrollPrev = useCallback(() => {
     if (emblaApi) {
       emblaApi.scrollPrev();
@@ -78,332 +73,134 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
     }
   }, [emblaApi]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent event bubbling
-    
-    if (submitting) return;
-    
-    // Only proceed if we're on the last step
-    if (currentStep !== FORM_STEPS.length - 1) {
+    e.stopPropagation();
+
+    // If not on the last step, just move to next step
+    if (currentStep < FORM_STEPS.length - 1) {
       scrollNext();
       return;
     }
-    
-    setSubmitting(true);
-    
-    try {
-      const hasEnabledNotifications = Object.values(formData.notifications).some(value => value);
-      const createdTree = await onSubmit(formData, isSubscribed);
 
-      if (hasEnabledNotifications && areNotificationsEnabled()) {
-        const enabledTypes = Object.entries(formData.notifications)
-          .filter(([_, enabled]) => enabled)
-          .map(([type]) => type as MaintenanceType);
+    // Only proceed with submission if we're on the last step
+    if (currentStep === FORM_STEPS.length - 1 && !submitting) {
+      setSubmitting(true);
+      
+      try {
+        const hasEnabledNotifications = Object.values(formData.notifications).some(value => value);
+        const createdTree = await onSubmit(formData, isSubscribed);
 
-        for (const type of enabledTypes) {
-          try {
-            await notificationService.updateMaintenanceSchedule(
-              createdTree.id,
-              createdTree.name,
-              type,
-              true,
-              undefined,
-              formData.notificationSettings
-            );
-          } catch (error) {
-            console.error(`Failed to setup ${type} notification:`, error);
+        if (hasEnabledNotifications && areNotificationsEnabled()) {
+          const enabledTypes = Object.entries(formData.notifications)
+            .filter(([_, enabled]) => enabled)
+            .map(([type]) => type as MaintenanceType);
+
+          for (const type of enabledTypes) {
+            try {
+              await notificationService.updateMaintenanceSchedule(
+                createdTree.id,
+                createdTree.name,
+                type,
+                true,
+                undefined,
+                formData.notificationSettings
+              );
+            } catch (error) {
+              console.error(`Failed to setup ${type} notification:`, error);
+            }
           }
         }
-      }
 
-      if (addToCalendar) {
-        try {
-          const selectedTypes = (Object.entries(formData.notifications)
-            .filter(([_, enabled]) => enabled)
-            .map(([type]) => type)) as MaintenanceType[];
+        if (addToCalendar) {
+          try {
+            const selectedTypes = (Object.entries(formData.notifications)
+              .filter(([_, enabled]) => enabled)
+              .map(([type]) => type)) as MaintenanceType[];
 
-          const calendarContent = await generateMaintenanceEvents(
-            { ...createdTree, maintenanceLogs: [], userEmail: '' },
-            selectedTypes
-          );
-          downloadCalendarFile(calendarContent, `${formData.name}-maintenance.ics`);
-        } catch (error) {
-          debug.error('Failed to generate calendar events:', error);
+            const calendarContent = await generateMaintenanceEvents(
+              { ...createdTree, maintenanceLogs: [], userEmail: '' },
+              selectedTypes
+            );
+            downloadCalendarFile(calendarContent, `${formData.name}-maintenance.ics`);
+          } catch (error) {
+            debug.error('Failed to generate calendar events:', error);
+          }
         }
-      }
 
-      onClose();
-    } catch (error) {
-      debug.error('Error submitting form:', error);
-    } finally {
-      setSubmitting(false);
+        onClose();
+      } catch (error) {
+        debug.error('Error submitting form:', error);
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
-  const handleImageCapture = (dataUrl: string) => {
-    setImageError(null);
-    setFormData(prev => ({
-      ...prev,
-      images: [...prev.images, dataUrl]
-    }));
-  };
-
-  const handleImageError = (error: string) => {
-    setImageError(error);
+  const handleFormDataChange = (updates: Partial<typeof formData>) => {
+    setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const handleSpeciesIdentified = (species: string) => {
-    setFormData(prev => ({
-      ...prev,
-      species
-    }));
+    handleFormDataChange({ species });
+    setShowSpeciesIdentifier(false);
   };
 
-  const handleNotificationChange = (type: keyof typeof formData.notifications, enabled: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [type]: enabled
-      }
-    }));
-  };
+  const steps = new TreeFormSteps({
+    formData,
+    onFormDataChange: handleFormDataChange,
+    onShowSpeciesIdentifier: () => setShowSpeciesIdentifier(true),
+    imageError,
+    onImageError: setImageError,
+    addToCalendar,
+    onAddToCalendarChange: setAddToCalendar
+  });
 
-  const handleNotificationTimeChange = (hours: number, minutes: number) => {
-    setFormData(prev => ({
-      ...prev,
-      notificationSettings: { hours, minutes }
-    }));
-  };
-
-  const renderStep = (step: string) => {
-    switch (step) {
-      case 'name':
-        return (
-          <div className="form-group text-center">
-            <label htmlFor="name" className="form-label text-xl mb-4">Name your Bonsai tree...</label>
-            <input
-              type="text"
-              id="name"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="form-input text-center text-xl max-w-md"
-              placeholder="Enter tree name"
-              autoFocus
-            />
-          </div>
-        );
-  
-      case 'photo':
-        return (
-          <div className="form-group text-center">
-            <label className="form-label text-xl mb-4">Add a photo of your tree</label>
-            <div className="w-full">
-              <ImageUpload 
-                onImageCapture={handleImageCapture}
-                onError={handleImageError}
-              />
-              
-              {imageError && (
-                <div className="mt-2 flex items-start space-x-2 text-red-600 dark:text-red-400 text-sm">
-                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>{imageError}</span>
-                </div>
-              )}
-              
-              {formData.images.length > 0 && (
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  {formData.images.map((image, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={image}
-                        alt={`Tree photo ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({
-                          ...prev,
-                          images: prev.images.filter((_, i) => i !== index)
-                        }))}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-  
-        case 'species':
-          return (
-            <div className="form-group text-center">
-              <label htmlFor="species" className="form-label text-xl mb-4">What species is your tree?</label>
-              <input
-                type="text"
-                id="species"
-                required
-                value={formData.species}
-                onChange={(e) => setFormData({ ...formData, species: e.target.value })}
-                className="form-input text-center text-xl"
-                placeholder="e.g., Japanese Maple"
-              />
-              <div className="mt-4 flex justify-center">
-                <SpeciesIdentifierLink
-                  hasUploadedImage={formData.images.length > 0}
-                  onClick={() => setShowSpeciesIdentifier(true)}
-                />
-              </div>
-            </div>
-          );
-  
-          case 'style':
-  return (
-    <div className="form-group text-center">
-      <label className="form-label text-xl mb-2">Select your tree's style</label>
-      <div className="w-full scale-75 md:scale-100"> {/* Added scaling for mobile */}
-        <StyleSelector
-          value={formData.style}
-          onChange={(style) => setFormData({ ...formData, style })}
-        />
-      </div>
-    </div>
-  );
-  
-      case 'date':
-        return (
-          <div className="form-group text-center">
-            <label htmlFor="dateAcquired" className="form-label text-xl mb-4">When did you get your tree?</label>
-            <input
-              type="date"
-              id="dateAcquired"
-              required
-              value={formData.dateAcquired}
-              onChange={(e) => setFormData({ ...formData, dateAcquired: e.target.value })}
-              className="form-input text-center text-xl"
-            />
-          </div>
-        );
-  
-      case 'notes':
-        return (
-          <div className="form-group text-center">
-            <label htmlFor="notes" className="form-label text-xl mb-4">Any additional notes?</label>
-            <textarea
-              id="notes"
-              rows={4}
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="form-input text-center"
-              placeholder="Add any notes about your bonsai..."
-            />
-          </div>
-        );
-  
-      case 'maintenance':
-        return (
-          <div className="form-group">
-            <MaintenanceSection
-              notifications={formData.notifications}
-              notificationTime={formData.notificationSettings}
-              onNotificationChange={handleNotificationChange}
-              onNotificationTimeChange={handleNotificationTimeChange}
-              addToCalendar={addToCalendar}
-              onAddToCalendarChange={setAddToCalendar}
-            />
-          </div>
-        );
-  
-      default:
-        return null;
+  const currentStepContent = () => {
+    switch (FORM_STEPS[currentStep].id) {
+      case 'name': return steps.renderNameStep();
+      case 'photo': return steps.renderPhotoStep();
+      case 'species': return steps.renderSpeciesStep();
+      case 'style': return steps.renderStyleStep();
+      case 'date': return steps.renderDateStep();
+      case 'notes': return steps.renderNotesStep();
+      case 'maintenance': return steps.renderMaintenanceStep();
+      default: return null;
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 pb-24 z-50">
       <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[calc(100vh-200px)] flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 flex flex-col items-center gap-3 p-3 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 rounded-t-xl">
-          <div className="w-full flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-bonsai-bark dark:text-white">Add New Bonsai</h2>
-            <button
-              onClick={onClose}
-              className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5 text-stone-500 dark:text-stone-400" />
-            </button>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {FORM_STEPS.map((step, index) => (
-              <div 
-                key={step.id}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  index === currentStep 
-                    ? 'bg-bonsai-green' 
-                    : 'bg-stone-200 dark:bg-stone-700'
-                }`}
-                title={step.label}
-              />
-            ))}
-          </div>
-        </div>
-   
-        <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
-          {/* Carousel area with constrained height */}
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <div ref={emblaRef}>
-              <div className="flex">
-                {FORM_STEPS.map((step) => (
-                  <div key={step.id} className="flex-[0_0_100%] min-w-0 p-3 flex justify-center">
-                    <div className="w-full max-w-md pt-">
-                      {renderStep(step.id)}
-                    </div>
+        <TreeFormHeader
+          currentStep={currentStep}
+          steps={FORM_STEPS}
+          onClose={onClose}
+        />
+        
+        <form onSubmit={handleFormEvent} className="flex flex-col min-h-0 flex-1">
+          <div className="h-[60vh] md:h-[500px] overflow-hidden"> {/* Responsive height */}
+            <div ref={emblaRef} className="h-full">
+              <div className="flex h-full">
+                <div className="flex-[0_0_100%] min-w-0 p-3 flex justify-center">
+                  <div className="w-full max-w-md overflow-y-auto">
+                    {currentStepContent()}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
-   
-          {/* Navigation - pushed to bottom */}
-          <div className="flex-shrink-0 mt-auto p-3 border-t border-stone-200 dark:border-stone-700 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={scrollPrev}
-              disabled={currentStep === 0}
-              className="flex items-center space-x-2 px-3 py-1.5 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-lg transition-colors disabled:opacity-50"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Previous</span>
-            </button>
-   
-            {currentStep === FORM_STEPS.length - 1 ? (
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex items-center space-x-2 px-4 py-1.5 bg-bonsai-green text-white rounded-lg hover:bg-bonsai-moss transition-colors disabled:opacity-50"
-              >
-                <span>{submitting ? 'Adding Tree...' : 'Add Tree'}</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={scrollNext}
-                className="flex items-center space-x-2 px-3 py-1.5 text-bonsai-green hover:bg-bonsai-green/10 rounded-lg transition-colors"
-              >
-                <span>Next</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            )}
-          </div>
+
+          <TreeFormNavigation
+            currentStep={currentStep}
+            totalSteps={FORM_STEPS.length}
+            onPrevious={scrollPrev}
+            onNext={scrollNext}
+            submitting={submitting}
+          />
         </form>
       </div>
-   
+
       {showSpeciesIdentifier && (
         <SpeciesIdentifierModal
           onClose={() => setShowSpeciesIdentifier(false)}
@@ -412,5 +209,5 @@ export function AddTreeForm({ onClose, onSubmit }: AddTreeFormProps) {
         />
       )}
     </div>
-   );
+  );
 }
