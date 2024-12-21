@@ -3,7 +3,7 @@ import { PRICING_TIERS } from '../config/pricing';
 export async function createCheckoutSession(
   priceId: string, 
   userEmail: string,
-  giftEmail?: string
+  giftEmail?: string,
 ): Promise<string> {
   const response = await fetch('/.netlify/functions/create-checkout-session', {
     method: 'POST',
