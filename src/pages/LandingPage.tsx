@@ -13,7 +13,7 @@ export function LandingPage() {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
-  const [showGiftSticker, setShowGiftSticker] = useState(true);
+  const [showGiftSticker, setShowGiftSticker] = useState(false); // not showing the 'Perfect Gift' sticker until next xmas
   const [checkingEmail, setCheckingEmail] = useState(false);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
