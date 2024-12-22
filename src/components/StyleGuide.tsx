@@ -71,9 +71,10 @@ export function StyleGuide() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <Compass className="w-8 h-8 text-bonsai-green" />
-      <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Bonsai Style Guide</h1>
-
+      <div className="flex items-center justify-center space-x-2 mb-4">
+        <Compass className="w-9 h-9 text-bonsai-green" />
+        <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">Bonsai Style Guide</h1>
+      </div>
       <div className="relative mb-12">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">

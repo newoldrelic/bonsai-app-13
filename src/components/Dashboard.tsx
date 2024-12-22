@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, Crown, Wifi, WifiOff } from 'lucide-react';
+import { TreeDeciduous, Plus, Crown, Wifi, WifiOff } from 'lucide-react';
 import { BonsaiCard } from './BonsaiCard';
 import { AddTreeForm } from './AddTreeForm';
 import { EditTreeForm } from './EditTreeForm';
@@ -60,7 +60,8 @@ export function Dashboard() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">My Bonsai Garden</h2>
+        <TreeDeciduous className="w-9 h-9 text-bonsai-green" />
+        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">My Bonsai Garden</h1>
         <div className="flex items-center space-x-4">
           {offline && (
             <div className="flex items-center text-amber-500 dark:text-amber-400">
