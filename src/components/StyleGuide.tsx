@@ -1,6 +1,6 @@
 import React from 'react';
 import { BackButton } from './BackButton';
-import { TreeDeciduous, Info, Wind, Mountain, Sprout, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Compass, TreeDeciduous, Info, Wind, Mountain, Sprout, ChevronLeft, ChevronRight } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 
 const BONSAI_STYLES = [
@@ -71,11 +71,8 @@ export function StyleGuide() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="mb-6">
-        <BackButton />
-      </div>
-
-      <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Bonsai Style Guide</h2>
+      <Compass className="w-8 h-8 text-bonsai-green" />
+      <h1 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Bonsai Style Guide</h1>
 
       <div className="relative mb-12">
         <div className="overflow-hidden" ref={emblaRef}>

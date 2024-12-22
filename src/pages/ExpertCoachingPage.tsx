@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, MessageCircle, Crown, ArrowRight, Phone } from 'lucide-react';
+import { PhoneCall, Bot, MessageCircle, Crown, ArrowRight, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import { ChatInterface } from '../components/ChatInterface';
@@ -63,7 +63,7 @@ export function ExpertCoachingPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Bot className="w-8 h-8 text-bonsai-green" />
+            <PhoneCall className="w-8 h-8 text-bonsai-green" />
             <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">AI Expert Coaching</h1>
           </div>
           <p className="text-gray-600 dark:text-gray-300">

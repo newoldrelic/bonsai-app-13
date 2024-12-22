@@ -2,10 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TreeDeciduous, Stethoscope, MessageCircle, Leaf, Compass } from 'lucide-react';
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { TreeDeciduous, Stethoscope, MessageCircle, Leaf, Compass } from 'lucide-react';
-
 export function Footer() {
   const navigate = useNavigate();
 
