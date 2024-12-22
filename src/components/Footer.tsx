@@ -2,6 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TreeDeciduous, Stethoscope, MessageCircle, Leaf, Compass } from 'lucide-react';
 
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { TreeDeciduous, Stethoscope, MessageCircle, Leaf, Compass } from 'lucide-react';
+
 export function Footer() {
   const navigate = useNavigate();
 
@@ -14,7 +18,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-bonsai-stone dark:bg-stone-900 border-t border-white/10 py-4 z-50">
+    <footer className="fixed bottom-0 left-0 right-0 bg-bonsai-stone dark:bg-stone-900 border-t border-white/10 py-4 z-40">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-5 gap-2 text-white/80">
           {mainItems.map(item => (
