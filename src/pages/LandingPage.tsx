@@ -152,7 +152,7 @@ export function LandingPage() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Enter your email to start"
+                          placeholder="Enter your email to start."
                           className="w-full min-w-0 px-4 py-3 rounded-l-full bg-stone-800/80 backdrop-blur-sm border border-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-white/50"
                           required
                         />
