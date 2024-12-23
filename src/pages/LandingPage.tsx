@@ -145,14 +145,14 @@ export function LandingPage() {
                 </p>
 
                 {!user ? (
-                  <div className="space-y-2 max-w-[320px] mt-6">
+                  <div className="space-y-2 max-w-[340px] mt-6">
                     <form onSubmit={handleEmailAuth} className="flex flex-col gap-2">
                       <div className="flex w-full">
                         <input
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Begin with Only Your Email"
+                          placeholder="Enter your email to start"
                           className="w-full min-w-0 px-4 py-3 rounded-l-full bg-stone-800/80 backdrop-blur-sm border border-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-white/50"
                           required
                         />
@@ -240,7 +240,7 @@ export function LandingPage() {
                       <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                     </button>
 
-                    {trees.length === 0 && (
+                    
                       <button 
                         onClick={() => navigate('/dashboard', { state: { showAddForm: true } })}
                         className="btn border-2 border-white text-white hover:bg-white hover:text-bonsai-stone text-center group px-6 py-2 rounded-full"
@@ -250,7 +250,7 @@ export function LandingPage() {
                           <Plus className="w-5 h-5 transform group-hover:rotate-90 transition-transform" />
                         </span>
                       </button>
-                    )}
+                  
                   </div>
                 )}
               </div>
