@@ -7,10 +7,10 @@ export function Footer() {
 
   const mainItems = [
     { id: 'garden', name: 'Garden', icon: TreeDeciduous, path: '/dashboard' },
+    { id: 'guide', name: 'Styles', icon: Compass, path: '/guide' },
+    { id: 'species', name: 'Identify', icon: Leaf, path: '/species-identifier' },
     { id: 'diagnose', name: 'Health', icon: Stethoscope, path: '/health-analytics' },
     { id: 'coaching', name: 'Coach', icon: MessageCircle, path: '/expert-coaching' },
-    { id: 'species', name: 'Identify', icon: Leaf, path: '/species-identifier' },
-    { id: 'guide', name: 'Styles', icon: Compass, path: '/guide' },
   ];
 
   return (

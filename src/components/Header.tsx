@@ -12,7 +12,7 @@ export function Header() {
   const { user, logout, signInWithGoogle } = useAuthStore();
   const { getCurrentPlan } = useSubscriptionStore();
   const currentPlan = getCurrentPlan();
-  const isSubscribed = currentPlan.id !== 'hobby';
+  const isSubscribed = currentPlan !== 'hobby';
 
   const menuItems = [
     { id: 'home', label: 'Home', path: '/', icon: Home },
@@ -74,7 +74,7 @@ export function Header() {
                           <div className="mt-2 flex items-center gap-2">
                             <Crown className={`w-4 h-4 ${isSubscribed ? 'text-bonsai-terra' : 'text-stone-400'}`} />
                             <span className={`text-sm font-medium ${isSubscribed ? 'text-bonsai-terra' : 'text-stone-500 dark:text-stone-400'}`}>
-                              {isSubscribed ? 'Premium Plan' : 'Free Plan'}
+                              {currentPlan === 'hobby' ? 'Free Plan' : 'Premium Plan'}
                             </span>
                             {!isSubscribed && (
                               <button
