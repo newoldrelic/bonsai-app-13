@@ -7,8 +7,10 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  fetchSignInMethodsForEmail,
   type User 
 } from 'firebase/auth';
+import { debug } from '../utils/debug';
 
 interface AuthState {
   user: User | null;
@@ -29,22 +31,18 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   checkEmailExists: async (email: string) => {
     try {
-      console.log('Starting email check for:', email);
-      // Try to sign in with an invalid password
-      // This will fail, but the error code will tell us if the user exists
-      await signInWithEmailAndPassword(auth, email, 'dummy-password');
-      return true; // This line won't be reached
+      debug.info('Starting email check for:', email);
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      debug.info('Sign-in methods found:', methods);
+      return methods.length > 0;
     } catch (error: any) {
-      console.log('Sign-in error code:', error.code);
-      // If error is invalid-credential or wrong-password, user exists
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
-        return true;
-      }
-      // If error is user-not-found, user doesn't exist
-      if (error.code === 'auth/user-not-found') {
-        return false;
+      debug.error('Error checking email:', error);
+      if (error.code === 'auth/invalid-email') {
+        throw new Error('Please enter a valid email address');
       }
       // For any other error, assume user doesn't exist
+      // but log the error for debugging
+      debug.error('Unexpected error during email check:', error);
       return false;
     }
   },
@@ -56,13 +54,25 @@ export const useAuthStore = create<AuthState>((set) => ({
       logAnalyticsEvent('login', { method: 'email' });
       set({ user: result.user, loading: false });
     } catch (error: any) {
-      console.error('Error signing in with email:', error);
+      debug.error('Error signing in with email:', error);
       let errorMessage = 'Failed to sign in. Please try again.';
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email. Please create an account first.';
-      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        errorMessage = 'Incorrect password. Please try again.';
+      
+      switch (error.code) {
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email. Please create an account first.';
+          break;
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          errorMessage = 'Incorrect password. Please try again.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many attempts. Please try again later.';
+          break;
       }
+      
       logAnalyticsEvent('login_error', { method: 'email', error: error.code });
       set({ error: errorMessage, loading: false });
     }
@@ -75,11 +85,24 @@ export const useAuthStore = create<AuthState>((set) => ({
       logAnalyticsEvent('sign_up', { method: 'email' });
       set({ user: result.user, loading: false });
     } catch (error: any) {
-      console.error('Error creating account:', error);
+      debug.error('Error creating account:', error);
       let errorMessage = 'Failed to create account. Please try again.';
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'An account already exists with this email. Please sign in instead.';
+      
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'An account already exists with this email. Please sign in instead.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Please enter a valid email address.';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Password should be at least 6 characters long.';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+          break;
       }
+      
       logAnalyticsEvent('sign_up_error', { method: 'email', error: error.code });
       set({ error: errorMessage, loading: false });
     }
@@ -94,18 +117,30 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ user: result.user, loading: false });
       } catch (popupError: any) {
         if (popupError.code === 'auth/popup-blocked') {
+          debug.info('Popup blocked, falling back to redirect...');
           await signInWithRedirect(auth, googleProvider);
         } else {
           throw popupError;
         }
       }
     } catch (error: any) {
-      console.error('Error signing in with Google:', error);
+      debug.error('Error signing in with Google:', error);
+      let errorMessage = 'Failed to sign in with Google. Please try again.';
+      
+      switch (error.code) {
+        case 'auth/popup-closed-by-user':
+          errorMessage = 'Sign in cancelled. Please try again.';
+          break;
+        case 'auth/account-exists-with-different-credential':
+          errorMessage = 'An account already exists with this email using a different sign-in method.';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your connection and try again.';
+          break;
+      }
+      
       logAnalyticsEvent('login_error', { method: 'google', error: error.code });
-      set({ 
-        error: 'Failed to sign in with Google. Please try again.',
-        loading: false 
-      });
+      set({ error: errorMessage, loading: false });
     }
   },
 
@@ -115,8 +150,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       await signOut(auth);
       logAnalyticsEvent('logout');
       set({ user: null, loading: false });
-    } catch (error) {
-      console.error('Error signing out:', error);
+    } catch (error: any) {
+      debug.error('Error signing out:', error);
       set({ 
         error: 'Failed to sign out. Please try again.',
         loading: false 
