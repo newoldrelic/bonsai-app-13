@@ -6,48 +6,89 @@ import { useBonsaiStore } from '../store/bonsaiStore';
 
 export function LandingPage() {
   const navigate = useNavigate();
-  const { user, signInWithGoogle, signInWithEmail, createAccount, loading, error, checkEmailExists } = useAuthStore();
+  const { user, signInWithGoogle, signInWithEmail, createAccount, loading, error: authError, checkEmailExists } = useAuthStore();
   const { trees } = useBonsaiStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
-  const [showGiftSticker, setShowGiftSticker] = useState(false); // not showing the 'Perfect Gift' sticker until next xmas
+  const [showGiftSticker, setShowGiftSticker] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (!showPasswordField) {
       setCheckingEmail(true);
       try {
-        console.log('Checking email:', email);
         const exists = await checkEmailExists(email);
-        console.log('Email exists?', exists);
         setIsNewUser(!exists);
-        console.log('Setting isNewUser to:', !exists);
         setShowPasswordField(true);
       } catch (error) {
         console.error('Error checking email:', error);
+        setError(error.message || 'Failed to verify email');
       } finally {
         setCheckingEmail(false);
       }
       return;
     }
 
-    if (!email || !password) return;
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
     
-    console.log('Attempting auth with isNewUser:', isNewUser);
-    if (isNewUser) {
-      await createAccount(email, password);
-    } else {
-      await signInWithEmail(email, password);
+    try {
+      if (isNewUser) {
+        await createAccount(email, password);
+      } else {
+        await signInWithEmail(email, password);
+      }
+    } catch (error: any) {
+      console.error('Auth error:', error);
+      
+      // Handle specific authentication errors
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          setError('An account with this email already exists');
+          setIsNewUser(false);
+          break;
+        case 'auth/invalid-credential':
+          setError('Invalid email or password');
+          break;
+        case 'auth/weak-password':
+          setError('Password should be at least 6 characters');
+          break;
+        case 'auth/invalid-email':
+          setError('Please enter a valid email address');
+          break;
+        default:
+          setError(error.message || 'Failed to sign in. Please try again.');
+      }
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      setError(error.message || 'Failed to sign in with Google');
     }
   };
 
   const navigateToGiftSection = () => {
     navigate('/pricing', { state: { scrollToGifts: true } });
+  };
+
+  const resetForm = () => {
+    setEmail('');
+    setPassword('');
+    setShowPasswordField(false);
+    setIsNewUser(false);
+    setError(null);
   };
 
   return (
@@ -73,10 +114,7 @@ export function LandingPage() {
                         <X className="w-4 h-4" />
                         <span className="text-sm font-medium">Close</span>
                       </button>
-                      <button
-                        onClick={navigateToGiftSection}
-                        className="relative"
-                      >
+                      <button onClick={navigateToGiftSection} className="relative">
                         <div className="absolute inset-0 bg-bonsai-terra rounded-lg transform rotate-3 group-hover:rotate-6 transition-transform"></div>
                         <div className="relative bg-white dark:bg-stone-800 text-bonsai-bark dark:text-white p-4 rounded-lg shadow-lg transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
                           <div className="flex items-center gap-2 text-bonsai-terra mb-2">
@@ -105,6 +143,7 @@ export function LandingPage() {
                   <a href="https://www.amazon.com/stores/author/B0DM2F226F/about" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80"> Ken Nakamura</a>, 
                   author of <a href="https://www.amazon.com/dp/1917554109" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80">Bonsai for Beginners</a>.
                 </p>
+
                 {!user ? (
                   <div className="space-y-2 max-w-[320px] mt-6">
                     <form onSubmit={handleEmailAuth} className="flex flex-col gap-2">
@@ -122,9 +161,10 @@ export function LandingPage() {
                           disabled={loading || checkingEmail}
                           className="px-6 py-3 bg-stone-800/80 backdrop-blur-sm border-l-0 border border-white/20 text-white font-medium rounded-r-full hover:bg-stone-700/80 transition-all disabled:opacity-50 flex items-center justify-center whitespace-nowrap"
                         >
-                          {checkingEmail ? 'Checking...' : 'Go'}
+                          {checkingEmail ? 'Checking...' : showPasswordField ? (isNewUser ? 'Sign Up' : 'Sign In') : 'Continue'}
                         </button>
                       </div>
+
                       {showPasswordField && (
                         <div className="relative">
                           <input
@@ -134,6 +174,7 @@ export function LandingPage() {
                             placeholder="Enter password"
                             className="w-full px-6 py-3 rounded-full bg-stone-800/80 backdrop-blur-sm border border-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-white/50 pr-12"
                             required
+                            minLength={6}
                           />
                           <button
                             type="button"
@@ -147,12 +188,26 @@ export function LandingPage() {
                     </form>
 
                     {showPasswordField && (
-                      <button
-                        onClick={() => setIsNewUser(!isNewUser)}
-                        className="w-full text-center text-white/90 hover:text-white text-sm font-medium"
-                      >
-                        {isNewUser ? 'Already have an account? Sign in' : 'Need an account? Create one'}
-                      </button>
+                      <>
+                        <button
+                          onClick={() => setIsNewUser(!isNewUser)}
+                          className="w-full text-center text-white/90 hover:text-white text-sm font-medium"
+                        >
+                          {isNewUser ? 'Already have an account? Sign in' : 'Need an account? Create one'}
+                        </button>
+                        <button
+                          onClick={resetForm}
+                          className="w-full text-center text-white/70 hover:text-white text-xs"
+                        >
+                          Use a different email
+                        </button>
+                      </>
+                    )}
+
+                    {(error || authError) && (
+                      <p className="text-red-400 text-xs bg-red-500/10 backdrop-blur-sm rounded-lg px-3 py-1.5">
+                        {error || authError}
+                      </p>
                     )}
 
                     <div className="flex items-center gap-2 text-white/80">
@@ -162,21 +217,15 @@ export function LandingPage() {
                     </div>
 
                     <button 
-                      onClick={signInWithGoogle}
+                      onClick={handleGoogleSignIn}
                       disabled={loading}
                       className={`w-full px-6 py-3 bg-stone-800/80 backdrop-blur-sm border border-white/20 text-white font-medium rounded-full hover:bg-stone-700/80 transition-all flex items-center justify-center gap-2 ${
-                        showPasswordField ? 'opacity-50' : ''
+                        loading ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
                       <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
                       <span>Continue with Google</span>
                     </button>
-
-                    {error && (
-                      <p className="text-red-400 text-xs bg-red-500/10 backdrop-blur-sm rounded-lg px-3 py-1.5">
-                        {error}
-                      </p>
-                    )}
                   </div>
                 ) : (
                   <div className="space-y-3 mt-6">
@@ -191,7 +240,7 @@ export function LandingPage() {
                       <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                     </button>
 
-                    <br/>
+                    {trees.length === 0 && (
                       <button 
                         onClick={() => navigate('/dashboard', { state: { showAddForm: true } })}
                         className="btn border-2 border-white text-white hover:bg-white hover:text-bonsai-stone text-center group px-6 py-2 rounded-full"
@@ -201,7 +250,7 @@ export function LandingPage() {
                           <Plus className="w-5 h-5 transform group-hover:rotate-90 transition-transform" />
                         </span>
                       </button>
-                    
+                    )}
                   </div>
                 )}
               </div>
