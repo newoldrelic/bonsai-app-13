@@ -143,16 +143,16 @@ export function LandingPage() {
                   <a href="https://www.amazon.com/stores/author/B0DM2F226F/about" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80"> Ken Nakamura</a>, 
                   author of <a href="https://www.amazon.com/dp/1917554109" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/80">Bonsai for Beginners</a>.
                 </p>
-
+<p className="text-white/90 dark:text-white/90 text-base md:text-lg leading-relaxed max-w-xl mt-3">Start for <b>free</b> with just your email...</p>
                 {!user ? (
-                  <div className="space-y-2 max-w-[340px] mt-6">
+                  <div className="space-y-2 max-w-[300px] mt-6">
                     <form onSubmit={handleEmailAuth} className="flex flex-col gap-2">
                       <div className="flex w-full">
                         <input
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Enter your email to start."
+                          placeholder="Enter your email"
                           className="w-full min-w-0 px-4 py-3 rounded-l-full bg-stone-800/80 backdrop-blur-sm border border-white/20 text-white placeholder-white/80 focus:outline-none focus:ring-2 focus:ring-white/50"
                           required
                         />
