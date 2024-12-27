@@ -60,7 +60,7 @@ export function Dashboard() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <TreeDeciduous className="w-9 h-9 text-bonsai-green" />
+        
         <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">My Bonsai Garden</h1>
         <div className="flex items-center space-x-4">
           {offline && (
