@@ -8,6 +8,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   fetchSignInMethodsForEmail,
+  browserPopupRedirectResolver,
   type User 
 } from 'firebase/auth';
 import { debug } from '../utils/debug';
@@ -111,13 +112,21 @@ export const useAuthStore = create<AuthState>((set) => ({
   signInWithGoogle: async () => {
     try {
       set({ loading: true, error: null });
+      
+      // Configure the Google provider with specific parameters
+      googleProvider.setCustomParameters({
+        prompt: 'select_account',
+        close_popup: 'true'
+      });
+
       try {
-        const result = await signInWithPopup(auth, googleProvider);
+        const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
         logAnalyticsEvent('login', { method: 'google' });
         set({ user: result.user, loading: false });
       } catch (popupError: any) {
-        if (popupError.code === 'auth/popup-blocked') {
-          debug.info('Popup blocked, falling back to redirect...');
+        if (popupError.code === 'auth/popup-blocked' || 
+            popupError.code === 'auth/popup-closed-by-user') {
+          debug.info('Popup issue, falling back to redirect...', popupError);
           await signInWithRedirect(auth, googleProvider);
         } else {
           throw popupError;
@@ -127,20 +136,25 @@ export const useAuthStore = create<AuthState>((set) => ({
       debug.error('Error signing in with Google:', error);
       let errorMessage = 'Failed to sign in with Google. Please try again.';
       
-      switch (error.code) {
-        case 'auth/popup-closed-by-user':
-          errorMessage = 'Sign in cancelled. Please try again.';
-          break;
-        case 'auth/account-exists-with-different-credential':
-          errorMessage = 'An account already exists with this email using a different sign-in method.';
-          break;
-        case 'auth/network-request-failed':
-          errorMessage = 'Network error. Please check your connection and try again.';
-          break;
+      // Only show error message for non-user-initiated cancellations
+      if (error.code !== 'auth/popup-closed-by-user') {
+        switch (error.code) {
+          case 'auth/account-exists-with-different-credential':
+            errorMessage = 'An account already exists with this email using a different sign-in method.';
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = 'Network error. Please check your connection and try again.';
+            break;
+          default:
+            errorMessage = 'Failed to sign in with Google. Please try again.';
+        }
+        
+        logAnalyticsEvent('login_error', { method: 'google', error: error.code });
+        set({ error: errorMessage, loading: false });
+      } else {
+        // Just reset loading state without error for user-initiated cancellations
+        set({ loading: false });
       }
-      
-      logAnalyticsEvent('login_error', { method: 'google', error: error.code });
-      set({ error: errorMessage, loading: false });
     }
   },
 
