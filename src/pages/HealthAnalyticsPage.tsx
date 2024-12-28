@@ -57,11 +57,11 @@ export function HealthAnalyticsPage() {
       navigate('/pricing');
       return;
     }
-  
+
     setLoading(true);
     setError(null);
     setCurrentStep(0);
-  
+
     // Simulate step progression
     const stepInterval = setInterval(() => {
       setCurrentStep(prev => {
@@ -70,7 +70,7 @@ export function HealthAnalyticsPage() {
         return prev;
       });
     }, 2000);
-  
+
     try {
       const response = await fetch('/.netlify/functions/analyze-health', {
         method: 'POST',
@@ -82,26 +82,26 @@ export function HealthAnalyticsPage() {
           prompt: AI_PROMPTS.healthAnalysis.prompt,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to analyze image');
       }
-  
+
       const data = await response.json();
       console.log('Raw API Response:', data);
-  
+
       if (data.error) {
         throw new Error(data.error);
       }
-  
+
       // Clean up the JSON string by removing markdown code blocks
       const cleanJsonString = data.analysis
         .replace(/```json\n?/g, '')  // Remove ```json
         .replace(/```\n?/g, '')      // Remove closing ```
         .trim();                     // Remove any extra whitespace
-  
+
       console.log('Cleaned JSON string:', cleanJsonString);
-  
+
       let parsedData;
       try {
         parsedData = JSON.parse(cleanJsonString);
@@ -109,9 +109,9 @@ export function HealthAnalyticsPage() {
         console.error('Failed to parse analysis:', e);
         throw new Error('Invalid response format from analysis');
       }
-  
+
       console.log('Parsed data:', parsedData);
-  
+
       // Validate the required fields exist
       if (!parsedData.scores || 
           typeof parsedData.scores.leafCondition === 'undefined' ||
@@ -119,7 +119,7 @@ export function HealthAnalyticsPage() {
           typeof parsedData.scores.overallVigor === 'undefined') {
         throw new Error('Incomplete analysis data received');
       }
-  
+
       // Create the scores array for the HealthScores component
       const healthScores = [
         {
@@ -141,12 +141,12 @@ export function HealthAnalyticsPage() {
           description: 'General health and growth potential'
         }
       ];
-  
+
       setAnalysis({
         text: parsedData.analysis,
         scores: healthScores
       });
-  
+
       // Store simplified health record in Firebase if we have a treeId
       if (treeId) {
         const healthRecord = {
@@ -158,10 +158,10 @@ export function HealthAnalyticsPage() {
           treeId,
           createdAt: serverTimestamp()
         };
-  
+
         await addDoc(collection(db, 'healthRecords'), healthRecord);
       }
-  
+
     } catch (err: any) {
       console.error('Analysis error:', err);
       setError(err.message || 'Failed to analyze image');
@@ -169,19 +169,6 @@ export function HealthAnalyticsPage() {
       clearInterval(stepInterval);
       setLoading(false);
     }
-  };
-
-    // Simulate step progression
-    const stepInterval = setInterval(() => {
-      setCurrentStep(prev => {
-        if (prev < ANALYSIS_STEPS.length - 1) return prev + 1;
-        clearInterval(stepInterval);
-        return prev;
-      });
-    }, 2000);
-
-    await analyzeWithDelay();
-    clearInterval(stepInterval);
   };
 
   const handleDownload = () => {
