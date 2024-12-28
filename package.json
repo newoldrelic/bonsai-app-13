@@ -12,6 +12,7 @@
     "build:functions": "npx tsc --project api/functions/tsconfig.json --listEmittedFiles"
   },
   "dependencies": {
+    "recharts": "^2.10.4",
     "@netlify/functions": "^2.6.0",
     "@stripe/stripe-js": "^2.4.0",
     "date-fns": "^3.3.1",
@@ -29,6 +30,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@types/recharts": "^2.0.0",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
