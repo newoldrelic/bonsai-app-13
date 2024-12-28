@@ -19,6 +19,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const [isHovering, setIsHovering] = useState(false);
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -40,14 +41,26 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   };
 
   const handleImageCapture = (imageData: string) => {
-    navigate('/health-analytics', { 
-      state: { 
-        treeId: tree.id,
-        treeName: tree.name,
-        treeImage: imageData
-      } 
-    });
+    setPreviewImage(imageData);
+  };
+
+  const handleAnalyzeClick = () => {
+    if (previewImage) {
+      navigate('/health-analytics', { 
+        state: { 
+          treeId: tree.id,
+          treeName: tree.name,
+          treeImage: previewImage
+        } 
+      });
+      setShowHealthModal(false);
+      setPreviewImage(null);
+    }
+  };
+
+  const handleCloseModal = () => {
     setShowHealthModal(false);
+    setPreviewImage(null);
   };
 
   return (
@@ -143,20 +156,48 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
             <div className="flex items-center justify-between p-4 border-b border-stone-200 dark:border-stone-700">
               <h2 className="text-lg font-semibold text-bonsai-bark dark:text-white">Health Check</h2>
               <button
-                onClick={() => setShowHealthModal(false)}
+                onClick={handleCloseModal}
                 className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 space-y-4">
-              <p className="text-stone-600 dark:text-stone-400">
-                Take a clear photo of your bonsai tree to analyze its health.
-              </p>
-              <ImageUpload 
-                onImageCapture={handleImageCapture}
-                onError={(error) => console.error('Upload error:', error)}
-              />
+              {!previewImage ? (
+                <>
+                  <p className="text-stone-600 dark:text-stone-400">
+                    Take a clear photo of your bonsai tree to analyze its health.
+                  </p>
+                  <ImageUpload 
+                    onImageCapture={handleImageCapture}
+                    onError={(error) => console.error('Upload error:', error)}
+                  />
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div className="relative">
+                    <img
+                      src={previewImage}
+                      alt="Tree preview"
+                      className="w-full h-64 object-contain rounded-lg border border-stone-200 dark:border-stone-700"
+                    />
+                    <button
+                      onClick={() => setPreviewImage(null)}
+                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <button
+                    onClick={handleAnalyzeClick}
+                    className="w-full bg-bonsai-green text-white px-4 py-2 rounded-lg hover:bg-bonsai-moss transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Activity className="w-5 h-5" />
+                    <span>Analyze Health</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
