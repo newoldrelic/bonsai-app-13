@@ -94,3 +94,19 @@ export interface NotificationSettings {
   minutes: number;
   schedules: MaintenanceSchedule[];
 }
+
+export interface HealthScores {
+  leafCondition: number;
+  diseaseAndPests: number;
+  overallVigor: number;
+  date: string;
+  analysis: string;
+}
+
+export interface BonsaiHealthRecord {
+  id: string;
+  treeId: string;
+  userEmail: string;
+  scores: HealthScores;
+  createdAt: string;
+}

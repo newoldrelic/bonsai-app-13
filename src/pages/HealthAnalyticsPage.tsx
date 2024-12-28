@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Leaf, TreeDeciduous, Crown, ArrowRight, Info, Bug } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import { HealthAnalyzer } from '../components/HealthAnalyzer';
 import { MarkdownContent } from '../components/MarkdownContent';
@@ -8,6 +9,7 @@ import HealthScores from '../components/HealthScores';
 import { FEATURES } from '../config/features';
 import { AI_PROMPTS } from '../config/ai-prompts';
 import { downloadText, formatAnalysisForDownload } from '../utils/download';
+import { db, auth } from '../config/firebase';
 
 const feature = FEATURES.find(f => f.id === 'health-analytics')!;
 
@@ -32,6 +34,8 @@ interface AnalysisResult {
 }
 
 export function HealthAnalyticsPage() {
+  const location = useLocation();
+  const { treeId, treeName, treeImage } = location.state || {};
   const navigate = useNavigate();
   const { getCurrentPlan } = useSubscriptionStore();
   const currentPlan = getCurrentPlan();
@@ -40,6 +44,13 @@ export function HealthAnalyticsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
+
+  // Automatically analyze tree image if provided through route state
+  useEffect(() => {
+    if (treeImage) {
+      handleImageUpload(treeImage);
+    }
+  }, [treeImage]);
 
   const handleImageUpload = async (imageData: string) => {
     if (!isSubscribed) {
@@ -127,6 +138,24 @@ export function HealthAnalyticsPage() {
           text: parsedData.analysis,
           scores: healthScores
         });
+
+        // Store health record in Firebase if we have a treeId
+        if (treeId) {
+          const healthRecord = {
+            treeId,
+            userEmail: auth.currentUser?.email,
+            scores: {
+              leafCondition: parsedData.scores.leafCondition,
+              diseaseAndPests: parsedData.scores.diseaseAndPests,
+              overallVigor: parsedData.scores.overallVigor,
+              date: new Date().toISOString(),
+              analysis: parsedData.analysis
+            },
+            createdAt: serverTimestamp()
+          };
+          await addDoc(collection(db, 'healthRecords'), healthRecord);
+        }
+
       } catch (err: any) {
         console.error('Analysis error:', err);
         setError(err.message || 'Failed to analyze image');

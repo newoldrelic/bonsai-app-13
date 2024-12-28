@@ -10,27 +10,12 @@ import {
   getDocs,
   onSnapshot,
   serverTimestamp,
-  enableIndexedDbPersistence,
-  enableMultiTabIndexedDbPersistence,
   waitForPendingWrites
 } from 'firebase/firestore';
 import type { BonsaiTree, MaintenanceLog } from '../types';
 import { auth, db, logAnalyticsEvent } from '../config/firebase';
 import { debug } from '../utils/debug';
 import { notificationService } from '../services/notificationService';
-
-// Enable offline persistence
-try {
-  enableMultiTabIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      enableIndexedDbPersistence(db);
-    } else if (err.code === 'unimplemented') {
-      console.warn('Browser doesn\'t support IndexedDB persistence');
-    }
-  });
-} catch (err) {
-  console.warn('Error enabling persistence:', err);
-}
 
 interface BonsaiStore {
   trees: BonsaiTree[];

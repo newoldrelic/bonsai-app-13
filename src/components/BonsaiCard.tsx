@@ -1,5 +1,7 @@
-import { Calendar, Droplets, TreeDeciduous, Edit2 } from 'lucide-react';
-import React from 'react';
+import { Calendar, Droplets, TreeDeciduous, Edit2, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSubscriptionStore } from '../store/subscriptionStore';
 import type { BonsaiTree } from '../types';
 
 interface BonsaiCardProps {
@@ -9,8 +11,33 @@ interface BonsaiCardProps {
 }
 
 export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
+  const navigate = useNavigate();
+  const { getCurrentPlan } = useSubscriptionStore();
+  const currentPlan = getCurrentPlan();
+  const isSubscribed = currentPlan !== 'hobby';
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleHealthCheck = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isSubscribed) {
+      navigate('/pricing');
+      return;
+    }
+    navigate('/health-analytics', { 
+      state: { 
+        treeId: tree.id,
+        treeName: tree.name,
+        treeImage: tree.images[0] 
+      } 
+    });
+  };
+
   return (
-    <div className="card overflow-hidden hover:scale-[1.02] transition-transform">
+    <div 
+      className="card overflow-hidden hover:scale-[1.02] transition-transform"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       <div 
         onClick={() => onClick(tree.id)}
         className="cursor-pointer"
@@ -31,6 +58,19 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
           )}
           <div className="absolute top-3 right-3 bg-bonsai-terra text-white text-xs px-2 py-1 rounded-full">
             {tree.style}
+          </div>
+          
+          {/* Health Check Button - Appears on Hover */}
+          <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-200 ${
+            isHovering ? 'opacity-100' : 'opacity-0'
+          }`}>
+            <button
+              onClick={handleHealthCheck}
+              className="bg-bonsai-green text-white px-4 py-2 rounded-lg hover:bg-bonsai-moss transition-colors flex items-center space-x-2"
+            >
+              <Activity className="w-4 h-4" />
+              <span>Run Health Check</span>
+            </button>
           </div>
         </div>
         
