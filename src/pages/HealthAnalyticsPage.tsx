@@ -62,106 +62,6 @@ export function HealthAnalyticsPage() {
     setError(null);
     setCurrentStep(0);
   
-    const analyzeWithDelay = async () => {
-      try {
-        const response = await fetch('/.netlify/functions/analyze-health', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            image: imageData,
-            prompt: AI_PROMPTS.healthAnalysis.prompt,
-          }),
-        });
-  
-        if (!response.ok) {
-          throw new Error('Failed to analyze image');
-        }
-  
-        const data = await response.json();
-        console.log('Raw API Response:', data);
-  
-        if (data.error) {
-          throw new Error(data.error);
-        }
-  
-        // Clean up the JSON string by removing markdown code blocks
-        const cleanJsonString = data.analysis
-          .replace(/```json\n?/g, '')  // Remove ```json
-          .replace(/```\n?/g, '')      // Remove closing ```
-          .trim();                     // Remove any extra whitespace
-  
-        console.log('Cleaned JSON string:', cleanJsonString);
-  
-        let parsedData;
-        try {
-          parsedData = JSON.parse(cleanJsonString);
-        } catch (e) {
-          console.error('Failed to parse analysis:', e);
-          throw new Error('Invalid response format from analysis');
-        }
-  
-        console.log('Parsed data:', parsedData);
-  
-        // Validate the required fields exist
-        if (!parsedData.scores || 
-            typeof parsedData.scores.leafCondition === 'undefined' ||
-            typeof parsedData.scores.diseaseAndPests === 'undefined' ||
-            typeof parsedData.scores.overallVigor === 'undefined') {
-          throw new Error('Incomplete analysis data received');
-        }
-  
-        // Create the scores array for the HealthScores component
-        const healthScores = [
-          {
-            category: 'Leaf Condition',
-            score: parsedData.scores.leafCondition,
-            icon: <Leaf className="w-6 h-6" />,
-            description: 'Overall health and appearance of leaves'
-          },
-          {
-            category: 'Disease & Pests',
-            score: parsedData.scores.diseaseAndPests,
-            icon: <Bug className="w-6 h-6" />,
-            description: 'Presence of diseases or pest infestations'
-          },
-          {
-            category: 'Overall Vigor',
-            score: parsedData.scores.overallVigor,
-            icon: <TreeDeciduous className="w-6 h-6" />,
-            description: 'General health and growth potential'
-          }
-        ];
-  
-        setAnalysis({
-          text: parsedData.analysis,
-          scores: healthScores
-        });
-  
-        // Store simplified health record in Firebase if we have a treeId
-        if (treeId) {
-          const healthRecord = {
-            date: new Date().toISOString(),
-            leafCondition: parsedData.scores.leafCondition,
-            diseaseAndPests: parsedData.scores.diseaseAndPests,
-            overallVigor: parsedData.scores.overallVigor,
-            userEmail: auth.currentUser?.email,
-            treeId,
-            createdAt: serverTimestamp()
-          };
-  
-          await addDoc(collection(db, 'healthRecords'), healthRecord);
-        }
-  
-      } catch (err: any) {
-        console.error('Analysis error:', err);
-        setError(err.message || 'Failed to analyze image');
-      } finally {
-        setLoading(false);
-      }
-    };
-  
     // Simulate step progression
     const stepInterval = setInterval(() => {
       setCurrentStep(prev => {
@@ -171,8 +71,104 @@ export function HealthAnalyticsPage() {
       });
     }, 2000);
   
-    await analyzeWithDelay();
-    clearInterval(stepInterval);
+    try {
+      const response = await fetch('/.netlify/functions/analyze-health', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: imageData,
+          prompt: AI_PROMPTS.healthAnalysis.prompt,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to analyze image');
+      }
+  
+      const data = await response.json();
+      console.log('Raw API Response:', data);
+  
+      if (data.error) {
+        throw new Error(data.error);
+      }
+  
+      // Clean up the JSON string by removing markdown code blocks
+      const cleanJsonString = data.analysis
+        .replace(/```json\n?/g, '')  // Remove ```json
+        .replace(/```\n?/g, '')      // Remove closing ```
+        .trim();                     // Remove any extra whitespace
+  
+      console.log('Cleaned JSON string:', cleanJsonString);
+  
+      let parsedData;
+      try {
+        parsedData = JSON.parse(cleanJsonString);
+      } catch (e) {
+        console.error('Failed to parse analysis:', e);
+        throw new Error('Invalid response format from analysis');
+      }
+  
+      console.log('Parsed data:', parsedData);
+  
+      // Validate the required fields exist
+      if (!parsedData.scores || 
+          typeof parsedData.scores.leafCondition === 'undefined' ||
+          typeof parsedData.scores.diseaseAndPests === 'undefined' ||
+          typeof parsedData.scores.overallVigor === 'undefined') {
+        throw new Error('Incomplete analysis data received');
+      }
+  
+      // Create the scores array for the HealthScores component
+      const healthScores = [
+        {
+          category: 'Leaf Condition',
+          score: parsedData.scores.leafCondition,
+          icon: <Leaf className="w-6 h-6" />,
+          description: 'Overall health and appearance of leaves'
+        },
+        {
+          category: 'Disease & Pests',
+          score: parsedData.scores.diseaseAndPests,
+          icon: <Bug className="w-6 h-6" />,
+          description: 'Presence of diseases or pest infestations'
+        },
+        {
+          category: 'Overall Vigor',
+          score: parsedData.scores.overallVigor,
+          icon: <TreeDeciduous className="w-6 h-6" />,
+          description: 'General health and growth potential'
+        }
+      ];
+  
+      setAnalysis({
+        text: parsedData.analysis,
+        scores: healthScores
+      });
+  
+      // Store simplified health record in Firebase if we have a treeId
+      if (treeId) {
+        const healthRecord = {
+          date: new Date().toISOString(),
+          leafCondition: parsedData.scores.leafCondition,
+          diseaseAndPests: parsedData.scores.diseaseAndPests,
+          overallVigor: parsedData.scores.overallVigor,
+          userEmail: auth.currentUser?.email,
+          treeId,
+          createdAt: serverTimestamp()
+        };
+  
+        await addDoc(collection(db, 'healthRecords'), healthRecord);
+      }
+  
+    } catch (err: any) {
+      console.error('Analysis error:', err);
+      setError(err.message || 'Failed to analyze image');
+    } finally {
+      clearInterval(stepInterval);
+      setLoading(false);
+    }
   };
 
     // Simulate step progression
