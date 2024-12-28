@@ -1,14 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Droplets, TreeDeciduous, Edit2, Activity, X } from 'lucide-react';
+import { Calendar, Droplets, TreeDeciduous, Edit2, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import { useSubscriptionStore } from '../store/subscriptionStore';
-import { ImageUpload } from './ImageUpload';
 import type { BonsaiTree } from '../types';
+import { BonsaiHealthChart } from './BonsaiHealthChart';
+import { HealthHistoryModal } from './HealthHistoryModal';
 
 interface BonsaiCardProps {
   tree: BonsaiTree;
   onClick: (id: string) => void;
   onEdit: (id: string) => void;
+}
+
+interface HealthRecord {
+  date: string;
+  leafCondition: number;
+  diseaseAndPests: number;
+  overallVigor: number;
 }
 
 export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
@@ -18,18 +28,34 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const isSubscribed = currentPlan !== 'hobby';
   const [isHovering, setIsHovering] = useState(false);
   const [showHealthModal, setShowHealthModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    const fetchHealthRecords = async () => {
+      try {
+        const q = query(
+          collection(db, 'healthRecords'),
+          where('treeId', '==', tree.id),
+          orderBy('date', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        const records = snapshot.docs.map(doc => ({
+          date: doc.data().date,
+          leafCondition: doc.data().leafCondition,
+          diseaseAndPests: doc.data().diseaseAndPests,
+          overallVigor: doc.data().overallVigor
+        }));
+        setHealthRecords(records);
+      } catch (error) {
+        console.error('Error fetching health records:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+    fetchHealthRecords();
+  }, [tree.id]);
 
   const handleHealthCheck = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -37,30 +63,18 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
       navigate('/pricing');
       return;
     }
+    navigate('/health-analytics', { 
+      state: { 
+        treeId: tree.id,
+        treeName: tree.name,
+        treeImage: tree.images[0] 
+      } 
+    });
+  };
+
+  const handleHealthHistoryClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setShowHealthModal(true);
-  };
-
-  const handleImageCapture = (imageData: string) => {
-    setPreviewImage(imageData);
-  };
-
-  const handleAnalyzeClick = () => {
-    if (previewImage) {
-      navigate('/health-analytics', { 
-        state: { 
-          treeId: tree.id,
-          treeName: tree.name,
-          treeImage: previewImage
-        } 
-      });
-      setShowHealthModal(false);
-      setPreviewImage(null);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setShowHealthModal(false);
-    setPreviewImage(null);
   };
 
   return (
@@ -92,18 +106,20 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
               {tree.style}
             </div>
             
-            {/* Health Check Button - Always visible on mobile, hover on desktop */}
-            <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-200 ${
-              isMobile || isHovering ? 'opacity-100' : 'opacity-0'
-            }`}>
-              <button
-                onClick={handleHealthCheck}
-                className="bg-bonsai-green text-white px-4 py-2 rounded-lg hover:bg-bonsai-moss transition-colors flex items-center space-x-2"
-              >
-                <Activity className="w-4 h-4" />
-                <span>Run Health Check</span>
-              </button>
-            </div>
+            {/* Health Check Button - Show on hover only if no records */}
+            {healthRecords.length === 0 && (
+              <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-200 ${
+                isHovering ? 'opacity-100' : 'opacity-0'
+              }`}>
+                <button
+                  onClick={handleHealthCheck}
+                  className="bg-bonsai-green text-white px-4 py-2 rounded-lg hover:bg-bonsai-moss transition-colors flex items-center space-x-2"
+                >
+                  <Activity className="w-4 h-4" />
+                  <span>Run Health Check</span>
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Content Section */}
@@ -115,6 +131,30 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
               <p className="text-sm text-stone-600 dark:text-stone-400 truncate">
                 {tree.species}
               </p>
+            </div>
+
+            {/* Health Sparkline Section */}
+            <div 
+              className="mb-4 cursor-pointer" 
+              onClick={(e) => handleHealthHistoryClick(e)}
+            >
+              {loading ? (
+                <div className="h-12 bg-stone-100 dark:bg-stone-800 rounded animate-pulse" />
+              ) : healthRecords.length > 0 ? (
+                <div className="hover:bg-stone-50 dark:hover:bg-stone-800/50 rounded p-2 -m-2 transition-colors">
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mb-1">
+                    Health History
+                  </p>
+                  <BonsaiHealthChart data={healthRecords} />
+                </div>
+              ) : (
+                <div 
+                  onClick={handleHealthCheck}
+                  className="h-12 border-2 border-dashed border-stone-200 dark:border-stone-700 rounded flex items-center justify-center text-sm text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                >
+                  Run a health check to track progress
+                </div>
+              )}
             </div>
             
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-stone-500 dark:text-stone-400">
@@ -149,58 +189,14 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
         </div>
       </div>
 
-      {/* Health Check Modal */}
+      {/* Health History Modal */}
       {showHealthModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-md">
-            <div className="flex items-center justify-between p-4 border-b border-stone-200 dark:border-stone-700">
-              <h2 className="text-lg font-semibold text-bonsai-bark dark:text-white">Health Check</h2>
-              <button
-                onClick={handleCloseModal}
-                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-4 space-y-4">
-              {!previewImage ? (
-                <>
-                  <p className="text-stone-600 dark:text-stone-400">
-                    Take a clear photo of your bonsai tree to analyze its health.
-                  </p>
-                  <ImageUpload 
-                    onImageCapture={handleImageCapture}
-                    onError={(error) => console.error('Upload error:', error)}
-                  />
-                </>
-              ) : (
-                <div className="space-y-4">
-                  <div className="relative">
-                    <img
-                      src={previewImage}
-                      alt="Tree preview"
-                      className="w-full h-64 object-contain rounded-lg border border-stone-200 dark:border-stone-700"
-                    />
-                    <button
-                      onClick={() => setPreviewImage(null)}
-                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <button
-                    onClick={handleAnalyzeClick}
-                    className="w-full bg-bonsai-green text-white px-4 py-2 rounded-lg hover:bg-bonsai-moss transition-colors flex items-center justify-center space-x-2"
-                  >
-                    <Activity className="w-5 h-5" />
-                    <span>Analyze Health</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <HealthHistoryModal
+          tree={tree}
+          healthRecords={healthRecords}
+          onClose={() => setShowHealthModal(false)}
+          onAnalyze={handleHealthCheck}
+        />
       )}
     </>
   );
