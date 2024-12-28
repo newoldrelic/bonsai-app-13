@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Droplets, TreeDeciduous, Edit2, Activity } from 'lucide-react';
+import { Calendar, Droplets, TreeDeciduous, Edit2, Activity, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useSubscriptionStore } from '../store/subscriptionStore';
+import { ImageUpload } from './ImageUpload';
 import type { BonsaiTree } from '../types';
 import { BonsaiHealthChart } from './BonsaiHealthChart';
 import { HealthHistoryModal } from './HealthHistoryModal';
@@ -28,6 +29,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const isSubscribed = currentPlan !== 'hobby';
   const [isHovering, setIsHovering] = useState(false);
   const [showHealthModal, setShowHealthModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,17 +59,22 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
     fetchHealthRecords();
   }, [tree.id]);
 
-  const handleHealthCheck = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleHealthCheck = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!isSubscribed) {
       navigate('/pricing');
       return;
     }
+    setShowUploadModal(true);
+  };
+
+  const handleImageCapture = (imageData: string) => {
+    setShowUploadModal(false);
     navigate('/health-analytics', { 
       state: { 
         treeId: tree.id,
         treeName: tree.name,
-        treeImage: tree.images[0] 
+        treeImage: imageData
       } 
     });
   };
@@ -136,20 +143,29 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
             {/* Health Sparkline Section */}
             <div 
               className="mb-4 cursor-pointer" 
-              onClick={(e) => handleHealthHistoryClick(e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                healthRecords.length > 0 ? handleHealthHistoryClick(e) : handleHealthCheck();
+              }}
             >
               {loading ? (
                 <div className="h-12 bg-stone-100 dark:bg-stone-800 rounded animate-pulse" />
               ) : healthRecords.length > 0 ? (
                 <div className="hover:bg-stone-50 dark:hover:bg-stone-800/50 rounded p-2 -m-2 transition-colors">
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mb-1">
-                    Health History
-                  </p>
+                  <div className="flex justify-between items-center mb-1">
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                      Health History
+                    </p>
+                    {healthRecords.length === 1 && (
+                      <p className="text-xs text-stone-400">
+                        Run another check to see trends
+                      </p>
+                    )}
+                  </div>
                   <BonsaiHealthChart data={healthRecords} />
                 </div>
               ) : (
                 <div 
-                  onClick={handleHealthCheck}
                   className="h-12 border-2 border-dashed border-stone-200 dark:border-stone-700 rounded flex items-center justify-center text-sm text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                 >
                   Run a health check to track progress
@@ -188,6 +204,32 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
           </button>
         </div>
       </div>
+
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-stone-200 dark:border-stone-700">
+              <h2 className="text-lg font-semibold text-bonsai-bark dark:text-white">Health Check</h2>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="p-1.5 hover:bg-stone-100 dark:hover:bg-stone-700 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <p className="text-stone-600 dark:text-stone-400">
+                Take a clear photo of your bonsai tree to analyze its health.
+              </p>
+              <ImageUpload 
+                onImageCapture={handleImageCapture}
+                onError={(error) => console.error('Upload error:', error)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Health History Modal */}
       {showHealthModal && (
