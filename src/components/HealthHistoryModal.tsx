@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Activity, Tree } from 'lucide-react';
+import { X, Activity, TreeDeciduous } from 'lucide-react';
 import { BonsaiHealthChart } from './BonsaiHealthChart';
 import type { BonsaiTree } from '../types';
 
@@ -74,7 +74,7 @@ export function HealthHistoryModal({ tree, healthRecords, onClose, onAnalyze }: 
             </>
           ) : (
             <div className="text-center py-8">
-              <Tree className="w-16 h-16 text-bonsai-green/30 mx-auto mb-4" />
+              <TreeDeciduous className="w-16 h-16 text-bonsai-green/30 mx-auto mb-4" />
               <p className="text-stone-600 dark:text-stone-400 mb-4">
                 No health records available yet.
               </p>
