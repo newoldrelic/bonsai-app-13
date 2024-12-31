@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Leaf, TreeDeciduous, Crown, ArrowRight, Info, Bug } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import { HealthAnalyzer } from '../components/HealthAnalyzer';
 import { MarkdownContent } from '../components/MarkdownContent';
@@ -147,20 +147,41 @@ export function HealthAnalyticsPage() {
         scores: healthScores
       });
 
-      // Store simplified health record in Firebase if we have a treeId
-      if (treeId) {
-        const healthRecord = {
-          date: new Date().toISOString(),
-          leafCondition: parsedData.scores.leafCondition,
-          diseaseAndPests: parsedData.scores.diseaseAndPests,
-          overallVigor: parsedData.scores.overallVigor,
-          userEmail: auth.currentUser?.email,
-          treeId,
-          createdAt: serverTimestamp()
-        };
+      // Inside handleImageUpload in HealthAnalyticsPage.tsx
+// Replace the existing Firebase storage code with:
 
-        await addDoc(collection(db, 'healthRecords'), healthRecord);
-      }
+// Store simplified health record in Firebase if we have a treeId
+if (treeId) {
+  const healthRecordRef = doc(db, 'healthRecords', treeId);
+  const newRecord = {
+    date: new Date().toISOString(),
+    leafCondition: parsedData.scores.leafCondition,
+    diseaseAndPests: parsedData.scores.diseaseAndPests,
+    overallVigor: parsedData.scores.overallVigor
+  };
+
+  try {
+    // Try to get existing document
+    const docSnap = await getDoc(healthRecordRef);
+
+    if (docSnap.exists()) {
+      // Update existing document by adding new record
+      await updateDoc(healthRecordRef, {
+        records: arrayUnion(newRecord)
+      });
+    } else {
+      // Create new document with first record
+      await setDoc(healthRecordRef, {
+        treeId,
+        userEmail: auth.currentUser?.email,
+        records: [newRecord]
+      });
+    }
+  } catch (error) {
+    console.error('Error storing health record:', error);
+    throw error;
+  }
+}
 
     } catch (err: any) {
       console.error('Analysis error:', err);
