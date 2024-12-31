@@ -147,41 +147,40 @@ export function HealthAnalyticsPage() {
         scores: healthScores
       });
 
-      // Inside handleImageUpload in HealthAnalyticsPage.tsx
-// Replace the existing Firebase storage code with:
+      // Store simplified health record in Firebase if we have a treeId
+      if (treeId && auth.currentUser?.email) {
+        const healthRecordRef = doc(db, 'healthRecords', treeId);
+        const newRecord = {
+          date: new Date().toISOString(),
+          leafCondition: parsedData.scores.leafCondition,
+          diseaseAndPests: parsedData.scores.diseaseAndPests,
+          overallVigor: parsedData.scores.overallVigor
+        };
 
-// Store simplified health record in Firebase if we have a treeId
-if (treeId) {
-  const healthRecordRef = doc(db, 'healthRecords', treeId);
-  const newRecord = {
-    date: new Date().toISOString(),
-    leafCondition: parsedData.scores.leafCondition,
-    diseaseAndPests: parsedData.scores.diseaseAndPests,
-    overallVigor: parsedData.scores.overallVigor
-  };
+        try {
+          // Try to get existing document
+          const docSnap = await getDoc(healthRecordRef);
 
-  try {
-    // Try to get existing document
-    const docSnap = await getDoc(healthRecordRef);
-
-    if (docSnap.exists()) {
-      // Update existing document by adding new record
-      await updateDoc(healthRecordRef, {
-        records: arrayUnion(newRecord)
-      });
-    } else {
-      // Create new document with first record
-      await setDoc(healthRecordRef, {
-        treeId,
-        userEmail: auth.currentUser?.email,
-        records: [newRecord]
-      });
-    }
-  } catch (error) {
-    console.error('Error storing health record:', error);
-    throw error;
-  }
-}
+          if (docSnap.exists()) {
+            // Update existing document by adding new record
+            await updateDoc(healthRecordRef, {
+              treeId,
+              userEmail: auth.currentUser.email,
+              records: arrayUnion(newRecord)
+            });
+          } else {
+            // Create new document with first record
+            await setDoc(healthRecordRef, {
+              treeId,
+              userEmail: auth.currentUser.email,
+              records: [newRecord]
+            });
+          }
+        } catch (error) {
+          console.error('Error storing health record:', error);
+          throw error;
+        }
+      }
 
     } catch (err: any) {
       console.error('Analysis error:', err);
