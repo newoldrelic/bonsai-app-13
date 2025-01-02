@@ -59,6 +59,12 @@
   }
 }
 
+@keyframes circle-progress {
+  0% {
+    stroke-dashoffset: 226.19; /* 2 * PI * 36 */
+  }
+}
+
 @layer utilities {
   .animate-fade-in {
     animation: fade-in 0.3s ease-out;

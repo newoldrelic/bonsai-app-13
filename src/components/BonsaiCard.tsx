@@ -6,9 +6,8 @@ import { db } from '../config/firebase';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import { ImageUpload } from './ImageUpload';
 import { CircularHealthScore } from './CircularHealthScore';
-import { HealthScoreMenu } from './HealthScoreMenu';
-import type { BonsaiTree } from '../types';
 import { HealthHistoryModal } from './HealthHistoryModal';
+import type { BonsaiTree } from '../types';
 
 interface BonsaiCardProps {
   tree: BonsaiTree;
@@ -28,7 +27,6 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const { getCurrentPlan } = useSubscriptionStore();
   const currentPlan = getCurrentPlan();
   const isSubscribed = currentPlan !== 'hobby';
-  const [isHovering, setIsHovering] = useState(false);
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
@@ -100,8 +98,6 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
     <>
       <div 
         className="card overflow-hidden hover:scale-[1.02] transition-transform"
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
       >
         <div onClick={() => onClick(tree.id)} className="cursor-pointer">
           {/* Image Section */}
@@ -135,27 +131,30 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
             </div>
 
             {/* Health Score Section */}
-            <div className="mb-4 relative group">
+            <div 
+              className="mb-4 cursor-pointer" 
+              onClick={(e) => {
+                e.stopPropagation();
+                healthRecords.length > 0 ? handleHealthHistoryClick(e) : handleHealthCheck(e);
+              }}
+            >
               {loading ? (
-                <div className="h-24 bg-stone-100 dark:bg-stone-800 rounded animate-pulse" />
-              ) : healthRecords.length > 0 && latestScore ? (
-                <>
-                  <CircularHealthScore
-                    score={latestScore.score}
-                    date={latestScore.date}
-                  />
-                  <HealthScoreMenu
-                    onViewHistory={handleHealthHistoryClick}
-                    onRunCheck={handleHealthCheck}
-                  />
-                </>
-              ) : (
-                <div 
-                  onClick={handleHealthCheck}
-                  className="h-24 border-2 border-dashed border-stone-200 dark:border-stone-700 rounded-lg flex items-center justify-center text-sm text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
-                >
-                  Run a health check to track progress
+                <div className="h-24 flex items-center justify-center">
+                  <div className="w-8 h-8 border-4 border-bonsai-green/30 border-t-bonsai-green rounded-full animate-spin" />
                 </div>
+              ) : healthRecords.length > 0 && latestScore ? (
+                <CircularHealthScore
+                  score={latestScore.score}
+                  date={latestScore.date}
+                />
+              ) : (
+                <button
+                  onClick={handleHealthCheck}
+                  className="w-full flex items-center justify-center space-x-2 text-bonsai-green hover:text-bonsai-moss transition-colors py-4"
+                >
+                  <Activity className="w-5 h-5" />
+                  <span className="font-medium">Run Health Check</span>
+                </button>
               )}
             </div>
             
@@ -206,7 +205,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
             </div>
             <div className="p-4 space-y-4">
               <p className="text-stone-600 dark:text-stone-400">
-                Take a clear photo of your bonsai tree to analyze its health
+                Take a clear photo of your bonsai tree to analyze its health.
               </p>
               <ImageUpload 
                 onImageCapture={handleImageCapture}
