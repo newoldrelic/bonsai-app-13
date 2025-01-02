@@ -206,7 +206,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
             </div>
             <div className="p-4 space-y-4">
               <p className="text-stone-600 dark:text-stone-400">
-                Take a clear photo of your bonsai tree to analyze its health.
+                Take a clear photo of your bonsai tree to analyze its health
               </p>
               <ImageUpload 
                 onImageCapture={handleImageCapture}
