@@ -33,17 +33,17 @@ export function HealthScoreMenu({ onViewHistory, onRunCheck, className = '' }: H
       className={`absolute inset-0 ${className}`}
     >
       {/* Overlay that appears on click */}
-      <div className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ${
+      <div className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity duration-200 rounded-2xl ${
         isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}>
-        <div className="flex flex-col gap-2 p-2 h-full items-center justify-center">
+        <div className="flex flex-col gap-2 p-3 h-full items-center justify-center">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onViewHistory();
               setIsOpen(false);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-white text-stone-800 rounded-lg transition-colors text-sm font-medium w-full max-w-[200px]"
+            className="flex items-center gap-2 px-4 py-2 bg-white/95 hover:bg-white text-stone-800 rounded-xl transition-all duration-150 text-sm font-medium w-full max-w-[200px] shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
           >
             <History className="w-4 h-4" />
             <span>View History</span>
@@ -54,10 +54,10 @@ export function HealthScoreMenu({ onViewHistory, onRunCheck, className = '' }: H
               onRunCheck();
               setIsOpen(false);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-bonsai-green/90 hover:bg-bonsai-green text-white rounded-lg transition-colors text-sm font-medium w-full max-w-[200px]"
+            className="flex items-center gap-2 px-4 py-2 bg-bonsai-green/95 hover:bg-bonsai-green text-white rounded-xl transition-all duration-150 text-sm font-medium w-full max-w-[200px] shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
           >
             <Activity className="w-4 h-4" />
-            <span>Run Health Check</span>
+            <span>Update Health Check</span>
           </button>
         </div>
       </div>

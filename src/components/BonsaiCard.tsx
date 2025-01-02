@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Droplets, TreeDeciduous, Edit2, Activity } from 'lucide-react';
+import { Calendar, Droplets, TreeDeciduous, Edit2, Activity, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -7,6 +7,7 @@ import { useSubscriptionStore } from '../store/subscriptionStore';
 import { ImageUpload } from './ImageUpload';
 import { CircularHealthScore } from './CircularHealthScore';
 import { HealthHistoryModal } from './HealthHistoryModal';
+import { HealthScoreMenu } from './HealthScoreMenu';
 import type { BonsaiTree } from '../types';
 
 interface BonsaiCardProps {
@@ -58,8 +59,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
     fetchHealthRecords();
   }, [tree.id]);
 
-  const handleHealthCheck = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
+  const handleHealthCheck = () => {
     if (!isSubscribed) {
       navigate('/pricing');
       return;
@@ -78,8 +78,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
     });
   };
 
-  const handleHealthHistoryClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleHealthHistoryClick = () => {
     setShowHealthModal(true);
   };
 
@@ -96,9 +95,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
 
   return (
     <>
-      <div 
-        className="card overflow-hidden hover:scale-[1.02] transition-transform"
-      >
+      <div className="card overflow-hidden hover:scale-[1.02] transition-transform">
         <div onClick={() => onClick(tree.id)} className="cursor-pointer">
           {/* Image Section */}
           <div className="relative h-40 sm:h-48 overflow-hidden">
@@ -131,25 +128,28 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
             </div>
 
             {/* Health Score Section */}
-            <div 
-              className="mb-4 cursor-pointer" 
-              onClick={(e) => {
-                e.stopPropagation();
-                healthRecords.length > 0 ? handleHealthHistoryClick(e) : handleHealthCheck(e);
-              }}
-            >
+            <div className="mb-4 relative">
               {loading ? (
                 <div className="h-24 flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-bonsai-green/30 border-t-bonsai-green rounded-full animate-spin" />
                 </div>
               ) : healthRecords.length > 0 && latestScore ? (
-                <CircularHealthScore
-                  score={latestScore.score}
-                  date={latestScore.date}
-                />
+                <>
+                  <CircularHealthScore
+                    score={latestScore.score}
+                    date={latestScore.date}
+                  />
+                  <HealthScoreMenu 
+                    onViewHistory={handleHealthHistoryClick}
+                    onRunCheck={handleHealthCheck}
+                  />
+                </>
               ) : (
                 <button
-                  onClick={handleHealthCheck}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleHealthCheck();
+                  }}
                   className="w-full flex items-center justify-center space-x-2 text-bonsai-green hover:text-bonsai-moss transition-colors py-4"
                 >
                   <Activity className="w-5 h-5" />
