@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Droplets, TreeDeciduous, Edit2, Activity, X } from 'lucide-react';
+import { Calendar, Droplets, TreeDeciduous, Edit2, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import { ImageUpload } from './ImageUpload';
+import { CircularHealthScore } from './CircularHealthScore';
+import { HealthScoreMenu } from './HealthScoreMenu';
 import type { BonsaiTree } from '../types';
-import { BonsaiHealthChart } from './BonsaiHealthChart';
 import { HealthHistoryModal } from './HealthHistoryModal';
 
 interface BonsaiCardProps {
@@ -34,29 +35,27 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Update the fetchHealthRecords function in BonsaiCard.tsx
-const fetchHealthRecords = async () => {
-  try {
-    const healthRecordRef = doc(db, 'healthRecords', tree.id);
-    const docSnap = await getDoc(healthRecordRef);
+    const fetchHealthRecords = async () => {
+      try {
+        const healthRecordRef = doc(db, 'healthRecords', tree.id);
+        const docSnap = await getDoc(healthRecordRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      const records = data.records || [];
-      // Sort records by date
-      const sortedRecords = [...records].sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-      setHealthRecords(sortedRecords);
-    } else {
-      setHealthRecords([]);
-    }
-  } catch (error) {
-    console.error('Error fetching health records:', error);
-  } finally {
-    setLoading(false);
-  }
-};
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const records = data.records || [];
+          const sortedRecords = [...records].sort((a, b) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+          setHealthRecords(sortedRecords);
+        } else {
+          setHealthRecords([]);
+        }
+      } catch (error) {
+        console.error('Error fetching health records:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchHealthRecords();
   }, [tree.id]);
@@ -86,6 +85,17 @@ const fetchHealthRecords = async () => {
     setShowHealthModal(true);
   };
 
+  const getLatestHealthScore = () => {
+    if (!healthRecords.length) return null;
+    const latest = healthRecords[0];
+    return {
+      score: (latest.leafCondition + latest.diseaseAndPests + latest.overallVigor) / 3,
+      date: latest.date
+    };
+  };
+
+  const latestScore = getLatestHealthScore();
+
   return (
     <>
       <div 
@@ -93,10 +103,7 @@ const fetchHealthRecords = async () => {
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        <div 
-          onClick={() => onClick(tree.id)}
-          className="cursor-pointer"
-        >
+        <div onClick={() => onClick(tree.id)} className="cursor-pointer">
           {/* Image Section */}
           <div className="relative h-40 sm:h-48 overflow-hidden">
             {tree.images[0] ? (
@@ -114,21 +121,6 @@ const fetchHealthRecords = async () => {
             <div className="absolute top-3 right-3 bg-bonsai-terra text-white text-xs px-2 py-1 rounded-full">
               {tree.style}
             </div>
-            
-            {/* Health Check Button - Show on hover only if no records */}
-            {healthRecords.length === 0 && (
-              <div className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-200 ${
-                isHovering ? 'opacity-100' : 'opacity-0'
-              }`}>
-                <button
-                  onClick={handleHealthCheck}
-                  className="bg-bonsai-green text-white px-4 py-2 rounded-lg hover:bg-bonsai-moss transition-colors flex items-center space-x-2"
-                >
-                  <Activity className="w-4 h-4" />
-                  <span>Run Health Check</span>
-                </button>
-              </div>
-            )}
           </div>
           
           {/* Content Section */}
@@ -142,33 +134,25 @@ const fetchHealthRecords = async () => {
               </p>
             </div>
 
-            {/* Health Sparkline Section */}
-            <div 
-              className="mb-4 cursor-pointer" 
-              onClick={(e) => {
-                e.stopPropagation();
-                healthRecords.length > 0 ? handleHealthHistoryClick(e) : handleHealthCheck();
-              }}
-            >
+            {/* Health Score Section */}
+            <div className="mb-4 relative group">
               {loading ? (
-                <div className="h-12 bg-stone-100 dark:bg-stone-800 rounded animate-pulse" />
-              ) : healthRecords.length > 0 ? (
-                <div className="hover:bg-stone-50 dark:hover:bg-stone-800/50 rounded p-2 -m-2 transition-colors">
-                  <div className="flex justify-between items-center mb-1">
-                    <p className="text-xs text-stone-500 dark:text-stone-400">
-                      Health History
-                    </p>
-                    {healthRecords.length === 1 && (
-                      <p className="text-xs text-stone-400">
-                        Run another check to see trends
-                      </p>
-                    )}
-                  </div>
-                  <BonsaiHealthChart data={healthRecords} />
-                </div>
+                <div className="h-24 bg-stone-100 dark:bg-stone-800 rounded animate-pulse" />
+              ) : healthRecords.length > 0 && latestScore ? (
+                <>
+                  <CircularHealthScore
+                    score={latestScore.score}
+                    date={latestScore.date}
+                  />
+                  <HealthScoreMenu
+                    onViewHistory={handleHealthHistoryClick}
+                    onRunCheck={handleHealthCheck}
+                  />
+                </>
               ) : (
                 <div 
-                  className="h-12 border-2 border-dashed border-stone-200 dark:border-stone-700 rounded flex items-center justify-center text-sm text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                  onClick={handleHealthCheck}
+                  className="h-24 border-2 border-dashed border-stone-200 dark:border-stone-700 rounded-lg flex items-center justify-center text-sm text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                 >
                   Run a health check to track progress
                 </div>
