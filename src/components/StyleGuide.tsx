@@ -70,17 +70,17 @@ export function StyleGuide() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto px-4 py-6 pb-24">
       <div className="flex items-center justify-center space-x-2 mb-4">
-        
         <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">Bonsai Style Guide</h1>
       </div>
-      <div className="relative mb-12">
+      
+      <div className="relative mb-8">
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {BONSAI_STYLES.map((style) => (
               <div key={style.name} className="flex-[0_0_100%] min-w-0 pl-4">
-                <div className="card h-[600px]">
+                <div className="card h-auto max-h-[600px] overflow-y-auto">
                   <div className="overflow-hidden rounded-t-lg bg-stone-100 dark:bg-stone-800">
                     <img
                       src={style.image}
