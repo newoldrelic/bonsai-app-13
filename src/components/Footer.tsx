@@ -14,17 +14,17 @@ export function Footer() {
   ];
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-bonsai-stone dark:bg-stone-900 border-t border-white/10 py-4 z-40">
+    <footer className="fixed bottom-0 left-0 right-0 bg-bonsai-stone dark:bg-stone-900 border-t border-white/10 z-40">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-5 gap-2 text-white/80">
+        <div className="grid grid-cols-5 gap-2">
           {mainItems.map(item => (
             <button 
               key={item.id}
               onClick={() => navigate(item.path)}
-              className="flex flex-col items-center p-2 hover:bg-stone-700/80 dark:hover:bg-stone-800 rounded-lg transition-colors group"
+              className="flex flex-col items-center py-3 px-2 hover:bg-stone-700/80 dark:hover:bg-stone-800 rounded-lg transition-colors group"
             >
               <item.icon className="w-6 h-6 text-bonsai-green group-hover:scale-110 transition-transform" />
-              <span className="text-center text-sm mt-1 line-clamp-1 dark:text-white/90">
+              <span className="text-center text-xs mt-1 text-white/90 dark:text-white/90 line-clamp-1">
                 {item.name}
               </span>
             </button>
