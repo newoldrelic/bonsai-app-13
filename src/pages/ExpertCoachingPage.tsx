@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { PhoneCall, Bot, MessageCircle, Crown, ArrowRight, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscriptionStore } from '../store/subscriptionStore';
@@ -10,6 +10,19 @@ export function ExpertCoachingPage() {
   const { getCurrentPlan } = useSubscriptionStore();
   const currentPlan = getCurrentPlan();
   const isSubscribed = currentPlan !== 'hobby';
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  // Initial page load scroll effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      chatRef.current?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSendMessage = async (message: string) => {
     const response = await fetch('/.netlify/functions/chat', {
@@ -59,73 +72,82 @@ export function ExpertCoachingPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <PhoneCall className="w-8 h-8 text-bonsai-green" />
-            <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">AI Expert Coaching</h1>
-          </div>
-          <p className="text-gray-600 dark:text-gray-300">
-            Get expert guidance through chat or voice interaction based on knowledge from Ken Nakamura, your bonsai expert.
-          </p>
-        </div>
-
-        <div className="mb-6">
-          <div className="flex space-x-4 justify-center">
-            <button
-              className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors bg-bonsai-green text-white"
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span>Chat</span>
-            </button>
-            <button
-              onClick={() => navigate('/voice-chat')}
-              className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"
-            >
-              <Phone className="w-5 h-5" />
-              <span>Voice</span>
-            </button>
-          </div>
-        </div>
-
-        <ChatInterface onSendMessage={handleSendMessage} />
-
-        <div className="mt-8 card p-6">
-          <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4">About Your Expert</h2>
-          <div className="prose prose-stone dark:prose-invert max-w-none">
-            <p className="text-sm">
-              Ken Nakamur-ai is an AI bonsai expert trained on decades of bonsai knowledge. He provides guidance on:
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <PhoneCall className="w-8 h-8 text-bonsai-green" />
+              <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">AI Expert Coaching</h1>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300">
+              Get expert guidance through chat or voice interaction based on knowledge from Ken Nakamura, your bonsai expert.
             </p>
-            <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-              <ul className="space-y-1">
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                  <span>Watering techniques</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                  <span>Pruning methods</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                  <span>Wiring guidance</span>
-                </li>
-              </ul>
-              <ul className="space-y-1">
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                  <span>Seasonal care</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                  <span>Disease control</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                  <span>Tool selection</span>
-                </li>
-              </ul>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="mb-6">
+            <div className="flex space-x-4 justify-center">
+              <button className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors bg-bonsai-green text-white">
+                <MessageCircle className="w-5 h-5" />
+                <span>Chat</span>
+              </button>
+              <button
+                onClick={() => navigate('/voice-chat')}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600"
+              >
+                <Phone className="w-5 h-5" />
+                <span>Voice</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Chat Interface */}
+          <div 
+            ref={chatRef}
+            className="h-[calc(100vh-13rem)] md:h-[calc(100vh-16rem)] mb-24 md:mb-28"
+          >
+            <ChatInterface onSendMessage={handleSendMessage} />
+          </div>
+
+          {/* About Expert Section */}
+          <div className="mt-8 card p-6">
+            <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4">About Your Expert</h2>
+            <div className="prose prose-stone dark:prose-invert max-w-none">
+              <p className="text-sm">
+                Ken Nakamur-ai is an AI bonsai expert trained on decades of bonsai knowledge. He provides guidance on:
+              </p>
+              <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
+                <ul className="space-y-1">
+                  <li className="flex items-center space-x-2">
+                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
+                    <span>Watering techniques</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
+                    <span>Pruning methods</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
+                    <span>Wiring guidance</span>
+                  </li>
+                </ul>
+                <ul className="space-y-1">
+                  <li className="flex items-center space-x-2">
+                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
+                    <span>Seasonal care</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
+                    <span>Disease control</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
+                    <span>Tool selection</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
