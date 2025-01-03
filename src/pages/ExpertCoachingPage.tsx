@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PhoneCall, Bot, MessageCircle, Crown, ArrowRight, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscriptionStore } from '../store/subscriptionStore';
@@ -11,17 +11,59 @@ export function ExpertCoachingPage() {
   const currentPlan = getCurrentPlan();
   const isSubscribed = currentPlan !== 'hobby';
   const chatRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initial page load scroll effect
+  // Handle initial page load and scroll effect
   useEffect(() => {
-    const timer = setTimeout(() => {
-      chatRef.current?.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 500);
+    // Mark component as loaded
+    setIsLoaded(true);
 
-    return () => clearTimeout(timer);
+    // Initial scroll to top
+    window.scrollTo({ top: 0, behavior: 'auto' });
+
+    // First delay to let content render
+    const initialTimer = setTimeout(() => {
+      // Smooth scroll sequence
+      const scrollSequence = async () => {
+        if (chatRef.current) {
+          const navHeight = 70; // Height of navigation elements
+          const chatTop = chatRef.current.offsetTop;
+          const targetPosition = chatTop - navHeight;
+
+          // Smooth scroll using requestAnimationFrame
+          const startPosition = window.pageYOffset;
+          const distance = targetPosition - startPosition;
+          const duration = 1500; // Longer duration for smoother scroll
+          const startTime = performance.now();
+
+          const easeInOutCubic = (t: number) => {
+            return t < 0.5
+              ? 4 * t * t * t
+              : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          };
+
+          const animateScroll = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const eased = easeInOutCubic(progress);
+            const currentPosition = startPosition + distance * eased;
+
+            window.scrollTo(0, currentPosition);
+
+            if (progress < 1) {
+              requestAnimationFrame(animateScroll);
+            }
+          };
+
+          requestAnimationFrame(animateScroll);
+        }
+      };
+
+      scrollSequence();
+    }, 50); // Shorter initial delay
+
+    return () => clearTimeout(initialTimer);
   }, []);
 
   const handleSendMessage = async (message: string) => {
@@ -76,7 +118,7 @@ export function ExpertCoachingPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header Section */}
-          <div className="text-center mb-8">
+          <div className={`text-center mb-8 transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
             <div className="flex items-center justify-center space-x-2 mb-4">
               <PhoneCall className="w-8 h-8 text-bonsai-green" />
               <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">AI Expert Coaching</h1>
@@ -103,10 +145,10 @@ export function ExpertCoachingPage() {
             </div>
           </div>
 
-          {/* Chat Interface */}
+          {/* Chat Interface Container */}
           <div 
             ref={chatRef}
-            className="h-[calc(100vh-13rem)] md:h-[calc(100vh-16rem)] mb-24 md:mb-28"
+            className="sticky top-4 h-[calc(100vh-12rem)] mb-8"
           >
             <ChatInterface onSendMessage={handleSendMessage} />
           </div>
