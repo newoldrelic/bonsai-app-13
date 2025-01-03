@@ -80,8 +80,8 @@ export function StyleGuide() {
   }, [emblaApi]);
 
   return (
-    <div className="min-h-screen bg-stone-100 dark:bg-stone-900">
-      <div className="container mx-auto px-4 py-6 pb-24">
+    <div className="flex flex-col min-h-screen bg-stone-100 dark:bg-stone-900">
+      <div className="flex-grow container mx-auto px-4 py-6">
         <div className="flex items-center justify-center space-x-2 mb-4">
           <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">Bonsai Style Guide</h1>
         </div>
@@ -91,12 +91,12 @@ export function StyleGuide() {
             <div className="flex">
               {BONSAI_STYLES.map((style) => (
                 <div key={style.name} className="flex-[0_0_100%] min-w-0 pl-4">
-                  <div className="card h-[calc(100vh-16rem)] overflow-y-auto">
+                  <div className="card">
                     <div className="overflow-hidden rounded-t-lg bg-stone-100 dark:bg-stone-800">
                       <img
                         src={style.image}
                         alt={style.name}
-                        className="w-full h-80 md:h-96 object-contain"
+                        className="w-full h-64 md:h-80 object-contain"
                       />
                     </div>
                     <div className="p-6">
@@ -134,7 +134,7 @@ export function StyleGuide() {
           </button>
         </div>
 
-        <div className="card p-6">
+        <div className="card p-6 mb-6">
           <div className="flex items-center space-x-3 mb-4">
             <Info className="w-6 h-6 text-bonsai-green" />
             <h3 className="text-xl font-semibold text-bonsai-bark dark:text-white">Tips for Choosing a Style</h3>
