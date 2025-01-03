@@ -51,12 +51,21 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
 
       set({ requests, loading: false });
       logAnalyticsEvent('support_requests_loaded');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading support requests:', error);
-      set({ 
-        error: 'Failed to load support requests. Please try again.',
-        loading: false 
-      });
+      
+      // Check if this is an indexing error
+      if (error.code === 'failed-precondition' || error.message?.includes('index')) {
+        set({ 
+          error: 'Support request system is being initialized. Please try again in a few minutes.',
+          loading: false 
+        });
+      } else {
+        set({ 
+          error: 'Failed to load support requests. Please try again.',
+          loading: false 
+        });
+      }
       logAnalyticsEvent('support_requests_load_error');
     }
   },
