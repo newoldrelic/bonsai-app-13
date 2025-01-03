@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Droplets, TreeDeciduous, Edit2, Activity, X } from 'lucide-react';
+import { Calendar, Droplets, Leaf, Bug, TreeDeciduous, Edit2, Activity, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
@@ -10,6 +10,7 @@ import { CircularHealthScore } from './CircularHealthScore';
 import { HealthHistoryModal } from './HealthHistoryModal';
 import { HealthScoreMenu } from './HealthScoreMenu';
 import { MaintenanceLogForm } from './MaintenanceLogForm';
+import { PieChart, Pie, Cell } from 'recharts';
 import type { BonsaiTree } from '../types';
 
 interface BonsaiCardProps {
@@ -25,6 +26,91 @@ interface HealthRecord {
   overallVigor: number;
 }
 
+interface MetricsProps {
+  leafCondition: number;
+  diseaseAndPests: number;
+  overallVigor: number;
+}
+
+const MiniHealthRings = ({ metrics }: { metrics: MetricsProps }) => {
+  const rings = [
+    { value: metrics.leafCondition, label: 'Leaf', Icon: Leaf },
+    { value: metrics.diseaseAndPests, label: 'Disease', Icon: Bug },
+    { value: metrics.overallVigor, label: 'Vigor', Icon: TreeDeciduous }
+  ];
+ 
+  const renderMetricRing = (data, index) => {
+    const segments = Array.from({ length: 5 }).map((_, i) => ({
+      value: 1,
+      filled: i + 1 <= data.value
+    }));
+ 
+    const Icon = data.Icon;
+ 
+    return (
+      <div 
+        key={data.label}
+        className="flex flex-col items-center gap-2" 
+      >
+        <div className="w-12 h-12 flex items-center justify-center overflow-visible">
+          <div className="relative w-10 h-10">
+            <PieChart width={50} height={50} className="absolute" style={{ top: '-2px', left: '-2px' }}>
+              <Pie
+                data={segments}
+                cx={17}
+                cy={17}
+                innerRadius={13}
+                outerRadius={20}
+                startAngle={90}
+                endAngle={-270}
+                dataKey="value"
+              >
+                {segments.map((entry, i) => {
+                  let fillColor = '#E5E7EB';
+                  if (entry.filled) {
+                    if (data.value >= 4) fillColor = '#10B981'; // emerald-500
+                    else if (data.value >= 3) fillColor = '#84CC16'; // lime-500
+                    else if (data.value >= 2) fillColor = '#EAB308'; // yellow-500
+                    else fillColor = '#EF4444'; // red-500
+                  }
+                  return (
+                    <Cell
+                      key={`cell-${i}`}
+                      fill={fillColor}
+                      opacity={1}
+                    />
+                  );
+                })}
+              </Pie>
+            </PieChart>
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <Icon 
+                className="w-5 h-5" 
+                style={{ 
+                  color: data.value >= 4 ? '#10B981' : 
+                         data.value >= 3 ? '#84CC16' : 
+                         data.value >= 2 ? '#EAB308' : 
+                         '#EF4444'
+                }} 
+              />
+            </div>
+          </div>
+        </div>
+        <div className="text-xs text-center">
+          <div className="font-medium text-stone-700 dark:text-stone-200">{data.value.toFixed(1)}</div>
+          <div className="text-stone-500 dark:text-stone-400 whitespace-nowrap">{data.label}</div>
+        </div>
+      </div>
+    );
+  };
+ 
+  return (
+    <div className="flex justify-center gap-6 mt-4 px-6 py-3 overflow-visible">
+      {rings.map((ring, index) => renderMetricRing(ring, index))}
+    </div>
+  );
+ };
+
 export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const navigate = useNavigate();
   const { getCurrentPlan } = useSubscriptionStore();
@@ -32,7 +118,6 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const currentPlan = getCurrentPlan();
   const isSubscribed = currentPlan !== 'hobby';
   
-  // State management
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showLogForm, setShowLogForm] = useState(false);
@@ -149,6 +234,13 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
                   <CircularHealthScore
                     score={latestScore.score}
                     date={latestScore.date}
+                  />
+                  <MiniHealthRings 
+                    metrics={{
+                      leafCondition: healthRecords[0].leafCondition,
+                      diseaseAndPests: healthRecords[0].diseaseAndPests,
+                      overallVigor: healthRecords[0].overallVigor
+                    }}
                   />
                   <HealthScoreMenu 
                     onViewHistory={handleHealthHistoryClick}
