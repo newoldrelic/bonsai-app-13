@@ -92,27 +92,30 @@ export function Dashboard() {
 
       {error && <AuthError />}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {trees.map(tree => (
-          <BonsaiCard 
-            key={tree.id} 
-            tree={tree} 
-            onClick={handleTreeClick}
-            onEdit={handleEditClick}
-          />
-        ))}
-        
-        {trees.length === 0 && (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No trees in your garden yet.</p>
-            <button
-              onClick={handleAddTreeClick}
-              className="mt-4 text-bonsai-green hover:text-bonsai-moss transition-colors"
-            >
-              Add your first tree
-            </button>
-          </div>
-        )}
+      <div className="h-[calc(100vh-200px)] overflow-y-auto snap-y snap-mandatory">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {trees.map(tree => (
+            <div className="snap-start scroll-mt-6" key={tree.id}>
+              <BonsaiCard 
+                tree={tree} 
+                onClick={handleTreeClick}
+                onEdit={handleEditClick}
+              />
+            </div>
+          ))}
+          
+          {trees.length === 0 && (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400">No trees in your garden yet.</p>
+              <button
+                onClick={handleAddTreeClick}
+                className="mt-4 text-bonsai-green hover:text-bonsai-moss transition-colors"
+              >
+                Add your first tree
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {showAddForm && (

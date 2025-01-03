@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useSubscriptionStore } from '../store/subscriptionStore';
+import { useBonsaiStore } from '../store/bonsaiStore';
 import { ImageUpload } from './ImageUpload';
 import { CircularHealthScore } from './CircularHealthScore';
 import { HealthHistoryModal } from './HealthHistoryModal';
 import { HealthScoreMenu } from './HealthScoreMenu';
+import { MaintenanceLogForm } from './MaintenanceLogForm';
 import type { BonsaiTree } from '../types';
 
 interface BonsaiCardProps {
@@ -26,10 +28,14 @@ interface HealthRecord {
 export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
   const navigate = useNavigate();
   const { getCurrentPlan } = useSubscriptionStore();
+  const { addMaintenanceLog } = useBonsaiStore();
   const currentPlan = getCurrentPlan();
   const isSubscribed = currentPlan !== 'hobby';
+  
+  // State management
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showLogForm, setShowLogForm] = useState(false);
   const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,6 +86,11 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
 
   const handleHealthHistoryClick = () => {
     setShowHealthModal(true);
+  };
+
+  const handleAddMaintenanceLog = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowLogForm(true);
   };
 
   const getLatestHealthScore = () => {
@@ -158,12 +169,25 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
               )}
             </div>
             
+            {/* Info Section */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-stone-500 dark:text-stone-400">
               <div className="flex items-center space-x-2">
-                <Droplets className="w-4 h-4 text-bonsai-moss flex-shrink-0" />
-                <span className="truncate">
-                  {tree.lastWatered ? new Date(tree.lastWatered).toLocaleDateString() : 'Not set'}
-                </span>
+                {tree.lastWatered ? (
+                  <>
+                    <Droplets className="w-4 h-4 text-bonsai-moss flex-shrink-0" />
+                    <span className="truncate">
+                      {new Date(tree.lastWatered).toLocaleDateString()}
+                    </span>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleAddMaintenanceLog}
+                    className="text-bonsai-green hover:text-bonsai-moss transition-colors flex items-center space-x-2"
+                  >
+                    <Droplets className="w-4 h-4" />
+                    <span>Add Watering Log</span>
+                  </button>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-bonsai-moss flex-shrink-0" />
@@ -190,7 +214,7 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
         </div>
       </div>
 
-      {/* Upload Modal */}
+      {/* Modals */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-stone-800 rounded-xl shadow-xl w-full max-w-md">
@@ -216,13 +240,22 @@ export function BonsaiCard({ tree, onClick, onEdit }: BonsaiCardProps) {
         </div>
       )}
 
-      {/* Health History Modal */}
       {showHealthModal && (
         <HealthHistoryModal
           tree={tree}
           healthRecords={healthRecords}
           onClose={() => setShowHealthModal(false)}
           onAnalyze={handleHealthCheck}
+        />
+      )}
+
+      {showLogForm && (
+        <MaintenanceLogForm
+          onClose={() => setShowLogForm(false)}
+          onSubmit={(formData) => {
+            addMaintenanceLog(tree.id, formData);
+            setShowLogForm(false);
+          }}
         />
       )}
     </>
