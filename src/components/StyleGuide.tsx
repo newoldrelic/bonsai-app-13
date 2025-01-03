@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
-import { Compass, TreeDeciduous, Info, Wind, Mountain, Sprout, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Compass, TreeDeciduous, Info, Wind, Mountain, Sprout, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 
 const BONSAI_STYLES = [
   {
@@ -70,6 +70,7 @@ export function StyleGuide() {
     loop: true,
     dragFree: true
   });
+  const [isTipsExpanded, setIsTipsExpanded] = useState(false);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -92,7 +93,7 @@ export function StyleGuide() {
               {BONSAI_STYLES.map((style) => (
                 <div key={style.name} className="flex-[0_0_100%] min-w-0 pl-4">
                   <div className="card">
-                    <div className="overflow-hidden rounded-t-lg bg-stone-100 dark:bg-stone-800">
+                    <div className="overflow-hidden rounded-t-lg bg-white dark:bg-stone-800">
                       <img
                         src={style.image}
                         alt={style.name}
@@ -134,14 +135,29 @@ export function StyleGuide() {
           </button>
         </div>
 
-        {/* Tips Section with fixed height */}
-        <div className="h-96">
-          <div className="card p-6 h-full">
-            <div className="flex items-center space-x-3 mb-4">
+        {/* Expandable Tips Section */}
+        <div className="card overflow-hidden mb-8 max-w-[calc(100%-1rem)] mx-auto">
+          <button
+            onClick={() => setIsTipsExpanded(!isTipsExpanded)}
+            className="w-full p-6 flex items-center justify-between hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+          >
+            <div className="flex items-center space-x-3">
               <Info className="w-6 h-6 text-bonsai-green" />
               <h3 className="text-xl font-semibold text-bonsai-bark dark:text-white">Tips for Choosing a Style</h3>
             </div>
-            <div className="space-y-4 text-gray-700 dark:text-gray-300">
+            {isTipsExpanded ? (
+              <ChevronUp className="w-6 h-6 text-stone-500 dark:text-stone-400" />
+            ) : (
+              <ChevronDown className="w-6 h-6 text-stone-500 dark:text-stone-400" />
+            )}
+          </button>
+          
+          <div 
+            className={`transition-all duration-300 ease-in-out overflow-hidden ${
+              isTipsExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="p-6 pt-0 space-y-4 text-gray-700 dark:text-gray-300">
               <p>
                 When selecting a style for your bonsai, consider these key factors:
               </p>
@@ -159,8 +175,8 @@ export function StyleGuide() {
           </div>
         </div>
 
-        {/* Add bottom spacing */}
-        <div className="h-24"></div>
+        {/* Bottom spacing */}
+        <div className="h-12"></div>
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PhoneCall, Bot, MessageCircle, Crown, ArrowRight, Phone } from 'lucide-react';
+import { PhoneCall, MessageCircle, Crown, ArrowRight, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscriptionStore } from '../store/subscriptionStore';
 import { ChatInterface } from '../components/ChatInterface';
 import { AI_PROMPTS } from '../config/ai-prompts';
+import ExpertInfoPopover from '../components/ExpertInfoPopover';
 
 export function ExpertCoachingPage() {
   const navigate = useNavigate();
@@ -13,57 +14,43 @@ export function ExpertCoachingPage() {
   const chatRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Handle initial page load and scroll effect
   useEffect(() => {
     // Mark component as loaded
     setIsLoaded(true);
 
-    // Initial scroll to top
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    // First, ensure we're at the top
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
-    // First delay to let content render
-    const initialTimer = setTimeout(() => {
-      // Smooth scroll sequence
-      const scrollSequence = async () => {
-        if (chatRef.current) {
-          const navHeight = 70; // Height of navigation elements
-          const chatTop = chatRef.current.offsetTop;
-          const targetPosition = chatTop - navHeight;
+    // Then set up the scroll to chat
+    const timer = setTimeout(() => {
+      if (chatRef.current) {
+        const startPosition = window.scrollY;
+        const chatTop = chatRef.current.getBoundingClientRect().top + window.scrollY;
+        const headerOffset = 80;
+        const targetPosition = chatTop - headerOffset;
+        const duration = 1500; // Duration in milliseconds - increase this for slower scroll
+        const startTime = performance.now();
 
-          // Smooth scroll using requestAnimationFrame
-          const startPosition = window.pageYOffset;
-          const distance = targetPosition - startPosition;
-          const duration = 1500; // Longer duration for smoother scroll
-          const startTime = performance.now();
+        function scrollStep(currentTime: number) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          // Easing function for smoother animation
+          const easeInOutCubic = (t: number) => 
+            t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
-          const easeInOutCubic = (t: number) => {
-            return t < 0.5
-              ? 4 * t * t * t
-              : 1 - Math.pow(-2 * t + 2, 3) / 2;
-          };
+          window.scrollTo(0, startPosition + (targetPosition - startPosition) * easeInOutCubic(progress));
 
-          const animateScroll = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-
-            const eased = easeInOutCubic(progress);
-            const currentPosition = startPosition + distance * eased;
-
-            window.scrollTo(0, currentPosition);
-
-            if (progress < 1) {
-              requestAnimationFrame(animateScroll);
-            }
-          };
-
-          requestAnimationFrame(animateScroll);
+          if (progress < 1) {
+            requestAnimationFrame(scrollStep);
+          }
         }
-      };
 
-      scrollSequence();
-    }, 50); // Shorter initial delay
+        requestAnimationFrame(scrollStep);
+      }
+    }, 250);
 
-    return () => clearTimeout(initialTimer);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleSendMessage = async (message: string) => {
@@ -122,6 +109,7 @@ export function ExpertCoachingPage() {
             <div className="flex items-center justify-center space-x-2 mb-4">
               <PhoneCall className="w-8 h-8 text-bonsai-green" />
               <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">AI Expert Coaching</h1>
+              <ExpertInfoPopover />
             </div>
             <p className="text-gray-600 dark:text-gray-300">
               Get expert guidance through chat or voice interaction based on knowledge from Ken Nakamura, your bonsai expert.
@@ -129,7 +117,7 @@ export function ExpertCoachingPage() {
           </div>
 
           {/* Navigation Buttons */}
-          <div className="mb-6">
+          <div className="mb-4">
             <div className="flex space-x-4 justify-center">
               <button className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors bg-bonsai-green text-white">
                 <MessageCircle className="w-5 h-5" />
@@ -148,48 +136,13 @@ export function ExpertCoachingPage() {
           {/* Chat Interface Container */}
           <div 
             ref={chatRef}
-            className="sticky top-4 h-[calc(100vh-12rem)] mb-8"
+            className="h-[calc(100vh-12rem)]"
           >
-            <ChatInterface onSendMessage={handleSendMessage} />
-          </div>
-
-          {/* About Expert Section */}
-          <div className="mt-8 card p-6">
-            <h2 className="text-xl font-semibold text-bonsai-bark dark:text-white mb-4">About Your Expert</h2>
-            <div className="prose prose-stone dark:prose-invert max-w-none">
-              <p className="text-sm">
-                Ken Nakamur-ai is an AI bonsai expert trained on decades of bonsai knowledge. He provides guidance on:
-              </p>
-              <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-                <ul className="space-y-1">
-                  <li className="flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                    <span>Watering techniques</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                    <span>Pruning methods</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                    <span>Wiring guidance</span>
-                  </li>
-                </ul>
-                <ul className="space-y-1">
-                  <li className="flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                    <span>Seasonal care</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                    <span>Disease control</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <span className="w-1.5 h-1.5 bg-bonsai-green rounded-full"></span>
-                    <span>Tool selection</span>
-                  </li>
-                </ul>
-              </div>
+            <div className="h-full flex flex-col bg-white dark:bg-stone-800 rounded-lg shadow-sm">
+              <ChatInterface 
+                onSendMessage={handleSendMessage}
+                className="flex-1 overflow-y-auto" 
+              />
             </div>
           </div>
         </div>
