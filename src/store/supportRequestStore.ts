@@ -1,5 +1,3 @@
-// store/supportRequestStore.ts
-
 import { create } from 'zustand';
 import { 
   collection, 
@@ -38,7 +36,7 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
       
       const q = query(
         collection(db, 'supportRequests'),
-        where('email', '==', auth.currentUser.email),
+        where('userEmail', '==', auth.currentUser.email),
         orderBy('createdAt', 'desc')
       );
       
@@ -64,13 +62,19 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
   },
 
   submitRequest: async (request: NewSupportRequest) => {
+    if (!auth.currentUser?.email) {
+      set({ error: 'You must be logged in to submit a support request.' });
+      return;
+    }
+
     try {
       set({ loading: true, error: null });
 
       const newRequest = {
         ...request,
         status: 'pending' as const,
-        userId: auth.currentUser?.uid,
+        userId: auth.currentUser.uid,
+        userEmail: auth.currentUser.email,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -78,10 +82,8 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
       // Try to store in Firebase first
       await addDoc(collection(db, 'supportRequests'), newRequest);
       
-      // If successful, reload requests if user is authenticated
-      if (auth.currentUser) {
-        await get().loadUserRequests();
-      }
+      // If successful, reload requests
+      await get().loadUserRequests();
       
       set({ loading: false });
       logAnalyticsEvent('support_request_submitted');
@@ -90,7 +92,7 @@ export const useSupportRequestStore = create<SupportRequestStore>((set, get) => 
       
       // If Firebase storage failed, fall back to email
       const mailtoUrl = `mailto:support@bonsaiforbeginners.app?subject=${encodeURIComponent(request.subject)}&body=${encodeURIComponent(
-        `Name: ${request.name}\nEmail: ${request.email}\n\n${request.message}`
+        `Name: ${request.name}\nEmail: ${request.userEmail}\n\n${request.message}`
       )}`;
       window.location.href = mailtoUrl;
       
