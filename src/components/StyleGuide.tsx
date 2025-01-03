@@ -80,8 +80,8 @@ export function StyleGuide() {
   }, [emblaApi]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-stone-100 dark:bg-stone-900">
-      <div className="flex-grow container mx-auto px-4 py-6">
+    <div className="bg-stone-100 dark:bg-stone-900">
+      <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-center space-x-2 mb-4">
           <h1 className="text-3xl font-bold text-bonsai-bark dark:text-white">Bonsai Style Guide</h1>
         </div>
@@ -134,27 +134,33 @@ export function StyleGuide() {
           </button>
         </div>
 
-        <div className="card p-6 mb-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <Info className="w-6 h-6 text-bonsai-green" />
-            <h3 className="text-xl font-semibold text-bonsai-bark dark:text-white">Tips for Choosing a Style</h3>
-          </div>
-          <div className="space-y-4 text-gray-700 dark:text-gray-300">
-            <p>
-              When selecting a style for your bonsai, consider these key factors:
-            </p>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>Natural growth pattern of the tree species</li>
-              <li>Existing trunk movement and branch placement</li>
-              <li>Root spread and nebari development</li>
-              <li>Overall tree health and vigor</li>
-              <li>Your skill level and available time for maintenance</li>
-            </ul>
-            <p>
-              Remember that the best style is one that enhances the tree's natural characteristics while creating a harmonious and balanced composition.
-            </p>
+        {/* Tips Section with fixed height */}
+        <div className="h-96">
+          <div className="card p-6 h-full">
+            <div className="flex items-center space-x-3 mb-4">
+              <Info className="w-6 h-6 text-bonsai-green" />
+              <h3 className="text-xl font-semibold text-bonsai-bark dark:text-white">Tips for Choosing a Style</h3>
+            </div>
+            <div className="space-y-4 text-gray-700 dark:text-gray-300">
+              <p>
+                When selecting a style for your bonsai, consider these key factors:
+              </p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Natural growth pattern of the tree species</li>
+                <li>Existing trunk movement and branch placement</li>
+                <li>Root spread and nebari development</li>
+                <li>Overall tree health and vigor</li>
+                <li>Your skill level and available time for maintenance</li>
+              </ul>
+              <p>
+                Remember that the best style is one that enhances the tree's natural characteristics while creating a harmonious and balanced composition.
+              </p>
+            </div>
           </div>
         </div>
+
+        {/* Add bottom spacing */}
+        <div className="h-24"></div>
       </div>
     </div>
   );
